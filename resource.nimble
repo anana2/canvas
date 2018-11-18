@@ -21,6 +21,7 @@ skipExt       = @["nim"]
 requires "nim >= 0.19.0"
 requires "jester 0.4.1"
 requires "karax 0.2.0"
+requires "jwt >= 0.0.1"
 
 
 # Tasks
