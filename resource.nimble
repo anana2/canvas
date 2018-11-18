@@ -28,21 +28,7 @@ requires "jwt >= 0.0.1"
 
 task mount, "Run the resource service":
     exec "nim c " & $backendpath
-    mkDir "bin/"
-    rmFile "bin/" & $backend .toExe
-    mvFile $backendpath.toExe, "bin/" & $backend .toExe
-    exec "bin/" & $backend .toExe
+    exec $backend .toExe
 
-task compile, "Compile the resource service":
-    exec "nim c " & $backendpath
-    mkDir "bin/"
-    rmFile "bin/" & $backend .toExe
-    mvFile $backendpath.toExe, "bin/" & $backend .toExe
-
-task start, "Runs the resource service":
-    if not fileExists "bin/" & $backend .toExe:
-        exec "nim c " & $backendpath
-        mkDir "bin/"
-        rmFile "bin/" & $backend .toExe
-        mvFile $backendpath.toExe, "bin/" & $backend .toExe
-    exec "bin/" & $backend .toExe
+task run, "Runs the resource service":
+    exec $backend .toExe
