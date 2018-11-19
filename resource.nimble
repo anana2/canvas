@@ -28,6 +28,9 @@ requires "jwt >= 0.0.1"
 
 task mount, "Run the resource service":
     exec "nim c " & $backendpath
+    if fileExists $backend .toExe:
+        rmFile $backend .toExe
+    mvFile $backendpath.toExe, $backend .toExe
     exec $backend .toExe
 
 task run, "Runs the resource service":
