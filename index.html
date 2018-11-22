@@ -50,7 +50,7 @@ $(function(){
 	var pos = document.getElementById("midpos");
 	var cv2 = cv.getContext("2d");
 	cv2.fillRect(50,25,1,1);
-	cv.addEventListener("mousemove",function(event){
+	addEventListener("mousemove",function(event){
 		writeMessage(cv);
 	});
 	cv.addEventListener("mousedown",function(event){
@@ -60,7 +60,9 @@ $(function(){
 				drawCanvas(cv);
 			}, 10);
 		}
-		else{
+	});
+	addEventListener("mousedown",function(event){
+		if(!drawing){
 			clickx = mousex;
 			clicky = mousey;
 			moving = true;
@@ -93,6 +95,7 @@ function ChangeDrawing(){
 };
 
 function ZoomIn(){
+	moving = false;
 	var div = document.getElementById("midscale");
 	z = z*2;
 	if(z > 32){
@@ -105,6 +108,7 @@ function ZoomIn(){
 	n.innerHTML = message;
 };
 function ZoomOut(){
+	moving = false;
 	var div = document.getElementById("midscale");
 	z = z/2;
 	if(z < 1){
@@ -114,42 +118,6 @@ function ZoomOut(){
 	
 	var n = document.getElementById("zoomlevel");
 	var message = "Zoom: "+z+"x  "; 
-	n.innerHTML = message;
-};
-function TranslateLeft(){
-	var div = document.getElementById("midpos");
-	x = x-1;
-	div.style.transform = "translate(" + x + "px," + y +"px)";
-	
-	var n = document.getElementById("translatelevel");
-	var message = "Camera Position: "+x+" "+y+"  ";  
-	n.innerHTML = message;
-};
-function TranslateRight(){
-	var div = document.getElementById("midpos");
-	x = x+1;
-	div.style.transform = "translate(" + x + "px," + y +"px)";
-	
-	var n = document.getElementById("translatelevel");
-	var message = "Camera Position: "+x+" "+y+"  ";  
-	n.innerHTML = message;
-};
-function TranslateUp(){
-	var div = document.getElementById("midpos");
-	y = y-1;
-	div.style.transform = "translate(" + x + "px," + y +"px)";
-	
-	var n = document.getElementById("translatelevel");
-	var message = "Camera Position: "+x+" "+y+"  ";  
-	n.innerHTML = message;
-};
-function TranslateDown(){
-	var div = document.getElementById("midpos");
-	y = y+1;
-	div.style.transform = "translate(" + x + "px," + y +"px)";
-	
-	var n = document.getElementById("translatelevel");
-	var message = "Camera Position: "+x+" "+y+"  ";  
 	n.innerHTML = message;
 };
 function writeMessage(canvas){
@@ -169,20 +137,41 @@ function writeMessage(canvas){
 		var div = document.getElementById("midpos");
 		x = x+(mult*diffx/z);
 		y = y+(mult2*diffy/z);
-		div.style.transform = "translate(" + x + "px," + y +"px)";
-		
+		if((-500*mult)<x){
+			if(x<(500*mult)){
+				if((-500*mult2)<y){
+					if(y<(500*mult2)){
+						div.style.transform = "translate(" + x + "px," + y +"px)";
+					}
+					else{
+						y = 500*mult2;
+						div.style.transform = "translate(" + x + "px," + y +"px)";
+					}
+				}
+				else{
+					y = -500*mult2;
+					div.style.transform = "translate(" + x + "px," + y +"px)";
+				}
+			}
+			else{
+				x = 500*mult;
+				div.style.transform = "translate(" + x + "px," + y +"px)";
+			}
+		}
+		else{
+			x = -500*mult;
+			div.style.transform = "translate(" + x + "px," + y +"px)";
+		}
 		mousex = mousex-diffx;
 		mousey = mousey-diffy;
 		
 		var n = document.getElementById("translatelevel");
-		var message = "Camera Position: "+x+" "+y+"  ";  
+		var message = "Camera Position: "+Math.floor(x)+" "+Math.floor(y)+"  ";  
 		n.innerHTML = message;
 	}
 	var n = document.getElementById("position");
 	var message = "Mouse Position: "+mousex+" "+mousey+" "; 
 	n.innerHTML = message;
-	
-	
 };
 function drawCanvas(canvas){
 	var ctx = canvas.getContext("2d");
@@ -194,10 +183,6 @@ function drawCanvas(canvas){
 <div class="top" height="10%">
 <button id="zoom" onclick="ZoomIn()">zoom+</button>
 <button id="zoom2" onclick="ZoomOut()">zoom-</button>
-<button id="move2" onclick="TranslateLeft()">-></button>
-<button id="move" onclick="TranslateRight()"><-</button>
-<button id="move" onclick="TranslateUp()">v</button>
-<button id="move" onclick="TranslateDown()">^</button>
 <button id="testbutton" onclick="ChangeDrawing()">Drawing</button>
 <span id="zoomlevel">Zoom: 1x  </span>
 <span id="translatelevel">Camera Position: 0 0  </span>
