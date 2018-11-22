@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+<style>
+html{
+	height:100%;
+}
+body{
+	height:90%;
+}
+div#mid{
+	image-rendering: pixelated;
+	background-color: gray;
+	width: 100%;
+	height: 100%;
+	overflow:hidden;
+}
+div#midpos{
+	transform: translate(0px,0px);
+	height: 100%;
+}
+div#midscale{
+	transform: scale(1,1);
+	height: 100%;
+}
+#canvas{
+	padding: 0;
+    margin: auto;
+    display: block;
+	height: 100%;
+}
+</style>
+<script>
+var x = 0;
+var y = 0;
+var z = 1;
+var width = 0;
+var height = 0;
+$(function(){
+	var cv = document.getElementById("canvas");
+	var cv2 = cv.getContext("2d");
+	cv2.fillRect(50,25,1,1);
+	cv.addEventListener("mousemove",function(event){
+		writeMessage(cv);
+	});
+});//end $(function(){});
+
+function ZoomIn(){
+	var div = document.getElementById("midscale");
+	z = z+0.1;
+	if(z > 3){
+		z = 3;
+	}
+	div.style.transform = "scale("+z+","+z+")";
+};
+function ZoomOut(){
+	var div = document.getElementById("midscale");
+	z = z-0.1;
+	if(z < 1){
+		z = 1;
+	}
+	div.style.transform = "scale("+z+","+z+")";
+};
+function TranslateLeft(){
+	var div = document.getElementById("midpos");
+	x = x-100;
+	div.style.transform = "translate(" + x + "px," + y +"px)";
+};
+function TranslateRight(){
+	var div = document.getElementById("midpos");
+	x = x+100;
+	div.style.transform = "translate(" + x + "px," + y +"px)";
+};
+function TranslateUp(){
+	var div = document.getElementById("midpos");
+	y = y-100;
+	div.style.transform = "translate(" + x + "px," + y +"px)";
+};
+function TranslateDown(){
+	var div = document.getElementById("midpos");
+	y = y+100;
+	div.style.transform = "translate(" + x + "px," + y +"px)";
+};
+function writeMessage(canvas){
+	var n = document.getElementById("position");
+	var rect = canvas.getBoundingClientRect();
+	var width = rect.right - rect.left;
+	var height = rect.bottom - rect.top;
+	var mult = width/100;
+	var mult2 = height/100;
+	var x2 = event.clientX - rect.left;
+	var y2 = event.clientY - rect.top;
+	x2 = Math.floor(x2/mult);
+	y2 = Math.floor(y2/mult2);
+	var message = ""+x2+" "+y2+""; 
+	var ctx = canvas.getContext("2d");
+	n.innerHTML = message;
+	ctx.fillRect(x2,y2,1,1);
+	
+};
+</script>
+</head>
+<body>
+<div class="top" height="10%">
+<button id="zoom" onclick="ZoomIn()">zoom+</button>
+<button id="zoom2" onclick="ZoomOut()">zoom-</button>
+<button id="move2" onclick="TranslateLeft()">translateLeft<-</button>
+<button id="move" onclick="TranslateRight()">translate-></button>
+<button id="move" onclick="TranslateUp()">translate Up</button>
+<button id="move" onclick="TranslateDown()">translate Down</button>
+<button id="testbutton">test</button>
+<span id="position">hey<span>
+</div>
+<div id="mid">
+<div id="midscale">
+<div id="midpos">
+<canvas id="canvas" width="100" height="100" style="border:1px solid #000000;">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+</div>
+</div>
+</div>
+<div class="bottom" height="10%">
+</div>
+</body>
+</html>
