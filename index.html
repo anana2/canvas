@@ -33,6 +33,13 @@ div#midscale{
 }
 </style>
 <script>
+var map = [];
+for(var i = 0; i < 1000; i++){
+	map[i] = [];
+	for(var j = 0; j < 1000; j++){
+		map[i][j] = false;
+	}
+}
 var x = 0;
 var y = 0;
 var z = 1;
@@ -49,7 +56,6 @@ $(function(){
 	var cv = document.getElementById("canvas");
 	var pos = document.getElementById("midpos");
 	var cv2 = cv.getContext("2d");
-	cv2.fillRect(50,25,1,1);
 	addEventListener("mousemove",function(event){
 		writeMessage(cv);
 	});
@@ -121,11 +127,19 @@ function ZoomOut(){
 	n.innerHTML = message;
 };
 function writeMessage(canvas){
+	var ctx = canvas.getContext("2d");
 	var rect = canvas.getBoundingClientRect();
 	var width = rect.right - rect.left;
 	var height = rect.bottom - rect.top;
 	var mult = width/1000;
 	var mult2 = height/1000;
+	
+	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
+		if(!map[mousex][mousey]){
+			ctx.clearRect(mousex,mousey,1,1);
+		}
+	}
+	
 	mousex = event.clientX - rect.left;
 	mousey = event.clientY - rect.top;
 	mousex = Math.floor(mousex/mult);
@@ -169,13 +183,23 @@ function writeMessage(canvas){
 		var message = "Camera Position: "+Math.floor(x)+" "+Math.floor(y)+"  ";  
 		n.innerHTML = message;
 	}
+	
+	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
+		if(!map[mousex][mousey]){
+			ctx.fillRect(mousex,mousey,1,1);
+		}
+	}
+	
 	var n = document.getElementById("position");
 	var message = "Mouse Position: "+mousex+" "+mousey+" "; 
 	n.innerHTML = message;
 };
 function drawCanvas(canvas){
-	var ctx = canvas.getContext("2d");
-	ctx.fillRect(mousex,mousey,1,1);
+	if(!map[mousex][mousey]){
+		map[mousex][mousey] = true;
+		var ctx = canvas.getContext("2d");
+		ctx.fillRect(mousex,mousey,1,1);
+	}
 };
 </script>
 </head>
