@@ -9,6 +9,10 @@ html{
 body{
 	height:90%;
 }
+.info{
+	display: inline-block;
+	width: 10%;
+}
 div#mid{
 	image-rendering: pixelated;
 	background-color: gray;
@@ -125,6 +129,14 @@ function ZoomOut(){
 	var n = document.getElementById("zoomlevel");
 	var message = "Zoom: "+z+"x  "; 
 	n.innerHTML = message;
+	
+	var cv = document.getElementById("canvas");
+	var ctx = cv.getContext("2d");
+	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
+		if(!map[mousex][mousey]){
+			ctx.clearRect(mousex,mousey,1,1);
+		}
+	}
 };
 function writeMessage(canvas){
 	var ctx = canvas.getContext("2d");
@@ -151,31 +163,21 @@ function writeMessage(canvas){
 		var div = document.getElementById("midpos");
 		x = x+(mult*diffx/z);
 		y = y+(mult2*diffy/z);
-		if((-500*mult)<x){
-			if(x<(500*mult)){
-				if((-500*mult2)<y){
-					if(y<(500*mult2)){
-						div.style.transform = "translate(" + x + "px," + y +"px)";
-					}
-					else{
-						y = 500*mult2;
-						div.style.transform = "translate(" + x + "px," + y +"px)";
-					}
-				}
-				else{
-					y = -500*mult2;
-					div.style.transform = "translate(" + x + "px," + y +"px)";
-				}
-			}
-			else{
-				x = 500*mult;
-				div.style.transform = "translate(" + x + "px," + y +"px)";
-			}
-		}
-		else{
+		
+		if(x<(-500*mult)){
 			x = -500*mult;
-			div.style.transform = "translate(" + x + "px," + y +"px)";
 		}
+		if(x>(500*mult)){
+			x = 500*mult;
+		}
+		if(y<(-500*mult2)){
+			y = -500*mult;
+		}
+		if(y>(500*mult2)){
+			y = 500*mult;
+		}
+		div.style.transform = "translate(" + x + "px," + y +"px)";
+					
 		mousex = mousex-diffx;
 		mousey = mousey-diffy;
 		
@@ -205,12 +207,12 @@ function drawCanvas(canvas){
 </head>
 <body>
 <div class="top" height="10%">
-<button id="zoom" onclick="ZoomIn()">zoom+</button>
-<button id="zoom2" onclick="ZoomOut()">zoom-</button>
-<button id="testbutton" onclick="ChangeDrawing()">Drawing</button>
-<span id="zoomlevel">Zoom: 1x  </span>
-<span id="translatelevel">Camera Position: 0 0  </span>
-<span id="position">Mouse Position: 0 0  </span>
+<button  class="info" id="zoom" onclick="ZoomIn()">zoom+</button>
+<button  class="info" id="zoom2" onclick="ZoomOut()">zoom-</button>
+<button  class="info" id="testbutton" onclick="ChangeDrawing()">Drawing</button>
+<span class="info" id="zoomlevel">Zoom: 1x  </span>
+<span class="info" id="translatelevel">Camera Position: 0 0  </span>
+<span class="info" id="position">Mouse Position: 0 0  </span>
 </div>
 <div id="mid">
 <div id="midscale">
