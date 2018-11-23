@@ -112,7 +112,7 @@ $(function(){
 	mid.addEventListener("wheel",function(event){
 		clickx = mousex;
 		clicky = mousey;
-		if(clickx < 0){
+		/*if(clickx < 0){
 			clickx = 0;
 		}else if(clickx > 999){
 			clickx = 999;
@@ -121,7 +121,7 @@ $(function(){
 			clicky = 0;
 		}else if(clicky > 999){
 			clicky = 999;
-		}
+		}*/
 		zooming = true;
 		var dir = Math.sign(event.wheelDelta);
 		Zoom(dir);
