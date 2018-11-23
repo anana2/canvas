@@ -36,6 +36,27 @@ div#midscale{
 	height: 100%;
 }
 </style>
+</head>
+<body>
+<div class="top" height="10%">
+<button  class="info" id="zoom" onclick="ZoomIn()">zoom+</button>
+<button  class="info" id="zoom2" onclick="ZoomOut()">zoom-</button>
+<span class="info" id="zoomlevel">Zoom: 1x  </span>
+<span class="info" id="translatelevel">Camera Position: 0 0  </span>
+<span class="info" id="position">Mouse Position: 0 0  </span>
+</div>
+<div id="mid">
+<div id="midscale">
+<div id="midpos">
+<canvas id="canvas" width="1000" height="1000">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+</div>
+</div>
+</div>
+<div class="bottom" height="10%">
+</div>
+</body>
 <script>
 var map = [];
 for(var i = 0; i < 1000; i++){
@@ -55,38 +76,71 @@ var diffx = 0;
 var diffy = 0;
 var drawing = true;
 var moving = false;
+var zooming = false;
 var interval;
 $(function(){
 	var cv = document.getElementById("canvas");
+	var mid = document.getElementById("mid");
 	var pos = document.getElementById("midpos");
 	var cv2 = cv.getContext("2d");
-	addEventListener("mousemove",function(event){
-		writeMessage(cv);
+	mid.addEventListener("mousemove",function(event){
+		if(!zooming){
+			writeMessage(cv);
+		}
 	});
 	cv.addEventListener("mousedown",function(event){
-		if(drawing){
+		drawing = true;
+		/*if(drawing){
 			drawCanvas(cv);
 			interval = setInterval(function(){
 				drawCanvas(cv);
 			}, 10);
-		}
+		}*/
 	});
-	addEventListener("mousedown",function(event){
-		if(!drawing){
+	mid.addEventListener("mousedown",function(event){
+		/*if(!drawing){
 			clickx = mousex;
 			clicky = mousey;
 			moving = true;
 			interval = setInterval(function(){}, 1000);
+		}*/
+		clickx = mousex;
+		clicky = mousey;
+		moving = true;
+		//interval = setInterval(function(){}, 1000);
+	});
+	mid.addEventListener("wheel",function(event){
+		clickx = mousex;
+		clicky = mousey;
+		if(clickx < 0){
+			clickx = 0;
+		}else if(clickx > 999){
+			clickx = 999;
 		}
+		if(clicky < 0){
+			clicky = 0;
+		}else if(clicky > 999){
+			clicky = 999;
+		}
+		zooming = true;
+		var dir = Math.sign(event.wheelDelta);
+		Zoom(dir);
+		zooming = false;
 	});
 	
 	addEventListener("mouseup",function(){
-		clearInterval(interval);
-		moving = false;
+		if(drawing){
+			moving = false;
+			drawCanvas(cv);
+		}
+		else{
+			//clearInterval(interval);
+			moving = false;
+		}
 	});
 });//end $(function(){});
 
-function ChangeDrawing(){
+/*function ChangeDrawing(){
 	if(drawing){
 		drawing = false;
 		
@@ -102,10 +156,9 @@ function ChangeDrawing(){
 		n.textContent = message;
 	}
 	console.log("done");
-};
+};*/
 
 function ZoomIn(){
-	moving = false;
 	var div = document.getElementById("midscale");
 	z = z*2;
 	if(z > 32){
@@ -118,7 +171,6 @@ function ZoomIn(){
 	n.innerHTML = message;
 };
 function ZoomOut(){
-	moving = false;
 	var div = document.getElementById("midscale");
 	z = z/2;
 	if(z < 1){
@@ -138,6 +190,46 @@ function ZoomOut(){
 		}
 	}
 };
+function Zoom(amount){
+	var div = document.getElementById("midscale");
+	if(z<3 && amount>0){
+		z = (Math.round((z+(amount*0.1))*10))/10;
+	}
+	else if(z<3.5 && amount<0){
+		z = (Math.round((z+(amount*0.1))*10))/10;
+	}
+	else if(z>15.5 && amount>0){
+		z = z+(2*amount);
+	}
+	else if(z>16 && amount<0){
+		z = z+(2*amount);
+	}
+	else{
+		z = z+amount;
+	}
+	if(z > 32){
+		z = 32;
+	}
+	else if(z < 1){
+		z = 1;
+	}
+	else{
+		div.style.transform = "scale("+z+","+z+")";
+	
+	var n = document.getElementById("zoomlevel");
+	var message = "Zoom: "+z+"x  "; 
+	n.innerHTML = message;
+	
+	var cv = document.getElementById("canvas");
+	/*var ctx = cv.getContext("2d");
+	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
+		if(!map[mousex][mousey]){
+			ctx.clearRect(mousex,mousey,1,1);
+		}
+	}*/
+	writeMessage(cv);
+	}
+};
 function writeMessage(canvas){
 	var ctx = canvas.getContext("2d");
 	var rect = canvas.getBoundingClientRect();
@@ -146,55 +238,62 @@ function writeMessage(canvas){
 	var mult = width/1000;
 	var mult2 = height/1000;
 	
-	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
-		if(!map[mousex][mousey]){
-			ctx.clearRect(mousex,mousey,1,1);
-		}
-	}
-	
+	var tempx = mousex;
+	var tempy = mousey;
 	mousex = event.clientX - rect.left;
 	mousey = event.clientY - rect.top;
 	mousex = Math.floor(mousex/mult);
 	mousey = Math.floor(mousey/mult2);
-	if(moving){
-		diffx = mousex-clickx;
-		diffy = mousey-clicky;
+	if(tempx == mousex && tempy == mousey){
+	
+	}
+	else{
+		if(tempx > -1 && tempx < 1000 && tempy > -1 && tempy < 1000){
+			if(!map[tempx][tempy]){
+				ctx.clearRect(tempx,tempy,1,1);
+			}
+		}
+		drawing = false;
+		if(moving || zooming){
+			diffx = mousex-clickx;
+			diffy = mousey-clicky;
 		
-		var div = document.getElementById("midpos");
-		x = x+(mult*diffx/z);
-		y = y+(mult2*diffy/z);
+			var div = document.getElementById("midpos");
+			x = x+(mult*diffx/z);
+			y = y+(mult2*diffy/z);
 		
-		if(x<(-500*mult)){
-			x = -500*mult;
-		}
-		if(x>(500*mult)){
-			x = 500*mult;
-		}
-		if(y<(-500*mult2)){
-			y = -500*mult;
-		}
-		if(y>(500*mult2)){
-			y = 500*mult;
-		}
-		div.style.transform = "translate(" + x + "px," + y +"px)";
-					
-		mousex = mousex-diffx;
-		mousey = mousey-diffy;
+			if(x<(-500*mult/z)){
+				x = -500*mult/z;
+			}
+			if(x>(500*mult/z)){
+				x = 500*mult/z;
+			}
+			if(y<(-500*mult2/z)){
+				y = -500*mult/z;
+			}
+			if(y>(500*mult2/z)){
+				y = 500*mult/z;
+			}
+			div.style.transform = "translate(" + x + "px," + y +"px)";
+						
+			mousex = mousex-diffx;
+			mousey = mousey-diffy;
 		
-		var n = document.getElementById("translatelevel");
-		var message = "Camera Position: "+Math.floor(x)+" "+Math.floor(y)+"  ";  
+			var n = document.getElementById("translatelevel");
+			var message = "Camera Position: "+Math.floor(x)+" "+Math.floor(y)+"  ";  
+			n.innerHTML = message;
+		}
+	
+		if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
+			if(!map[mousex][mousey]){
+				ctx.fillRect(mousex,mousey,1,1);
+			}
+		}
+	
+		var n = document.getElementById("position");
+		var message = "Mouse Position: "+mousex+" "+mousey+" "; 
 		n.innerHTML = message;
 	}
-	
-	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
-		if(!map[mousex][mousey]){
-			ctx.fillRect(mousex,mousey,1,1);
-		}
-	}
-	
-	var n = document.getElementById("position");
-	var message = "Mouse Position: "+mousex+" "+mousey+" "; 
-	n.innerHTML = message;
 };
 function drawCanvas(canvas){
 	if(!map[mousex][mousey]){
@@ -204,26 +303,4 @@ function drawCanvas(canvas){
 	}
 };
 </script>
-</head>
-<body>
-<div class="top" height="10%">
-<button  class="info" id="zoom" onclick="ZoomIn()">zoom+</button>
-<button  class="info" id="zoom2" onclick="ZoomOut()">zoom-</button>
-<button  class="info" id="testbutton" onclick="ChangeDrawing()">Drawing</button>
-<span class="info" id="zoomlevel">Zoom: 1x  </span>
-<span class="info" id="translatelevel">Camera Position: 0 0  </span>
-<span class="info" id="position">Mouse Position: 0 0  </span>
-</div>
-<div id="mid">
-<div id="midscale">
-<div id="midpos">
-<canvas id="canvas" width="1000" height="1000">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-</div>
-</div>
-</div>
-<div class="bottom" height="10%">
-</div>
-</body>
 </html>
