@@ -1,0 +1,1 @@
+web: gunicorn canvas_resource:app
