@@ -1,15 +1,17 @@
-from flask import Flask, url_for
+from flask import Flask, render_template
+from flask_collect import Collect
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = 'secret'
+# static file collection
+collect = Collect(app)
 
 import canvas_resource.logging
 
 
 @app.route('/')
 def root():
-    return url_for('static', filename='index.html')
+    return render_template('index.html')
 
 @app.route('/greet')
 def greeting():
