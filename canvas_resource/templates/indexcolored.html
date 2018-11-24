@@ -1,11 +1,16 @@
 <!doctype html>
 <html>
 <head>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js">
+/*body{
+	height:90%;
+	a
+	
+}*/
 </script>
 <style>
 html{
-	height:100%;
+	height:100vh;
 }
 
 .info{
@@ -13,13 +18,12 @@ html{
 	width: 10%;
 }
 div#top{
-	height: 5%
 }
 div#mid{
 	image-rendering: pixelated;
 	background-color: gray;
 	width: 100%;
-	height: 90%;
+	height: 90vh;
 	overflow:hidden;
 }
 div#midpos{
@@ -31,35 +35,74 @@ div#midscale{
 	height: 100%;
 }
 div#bottom{
-	image-rendering: pixelated;
-	height: 5%;
 }
 div#bottomleft{
 	display: inline-block;
 	width:33%;
-	height: 100%;
 }
 div#bottommid{
 	display: inline-block;
-	width:33%;
-	height: 100%;
-}
-div#bottomright{
-	display: inline-block;
-	width:33%;
-	height: 100%;
+	width:66%;
 }
 div#bottomsub1{
 	display: inline-block;
-	width: 16%;
-}
-div#bottomsub{
-	display: inline-block;
-	width: 66%;
+	width: 8%;
 }
 div#bottomsub2{
 	display: inline-block;
-	width: 16%;
+	width: 33%;
+}
+div#bottomsub3{
+	display: inline-block;
+	width: 8%;
+}
+div#bottomsub4{
+	display: inline-block;
+	width:50%;
+}
+div.leftrange{
+	width: 100%;
+}
+.slider{
+	-webkit-appearance: none;
+	width: 75%;
+	height: 5px;
+	border-radius: 2px;
+	background: #dddddd;
+	outline: none;
+	opacity: 0.7;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
+}
+.slider:hover{
+	opacity: 1;
+}
+input#Red::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+	border-radius: 50%;
+    background: #ff0000;
+    cursor: pointer;
+}
+input#Green::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+	border-radius: 50%;
+    background: #00ff00;
+    cursor: pointer;
+}
+input#Blue::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+	border-radius: 50%;
+    background: #0000ff;
+    cursor: pointer;
 }
 #canvas{
 	image-rendering: pixelated;
@@ -70,11 +113,11 @@ div#bottomsub2{
 	height: 100%;
 }
 #color1{
+	image-rendering: pixelated;
 	padding: 0;
     margin: auto;
     display: block;
 	width: 7%;
-	transform: translate(0px,3px);
 }
 #color2{
 	image-rendering: pixelated;
@@ -111,24 +154,38 @@ Your browser does not support the HTML5 canvas tag.
 </div>
 </div>
 <div class="bottom">
-<div id="bottomleft"></div>
+<div id="bottomleft">
+<div class="leftrange">
+<input type="range" min="0" max="255" value="0" class="slider" id="Red">
+<span id="redtext">Red: 0</span>
+</div>
+<div class="leftrange">
+<input type="range" min="0" max="255" value="0" class="slider" id="Green">
+<span id="greentext">Green: 0</span>
+</div>
+<div class="leftrange">
+<input type="range" min="0" max="255" value="0" class="slider" id="Blue">
+<span id="bluetext">Blue: 0</span>
+</div>
+</div>
 <div id="bottommid">
 <div id="bottomsub1">
-<span id="colorstring">#000000</span>
+<span id="colorstring2">#000000</span>
+
 </div>
-<div id="bottomsub">
-<canvas id="color1" width="1" height="1">
+<div id="bottomsub2">
+<canvas id="color1" width="2" height="2">
 Your browser does not support the HTML5 canvas tag.
 </canvas>
 </div>
-<div id="bottomsub2">
-<span id="colorstring2">#000000</span>
+<div id="bottomsub3">
+<span id="colorstring">#000000</span>
 </div>
-</div>
-<div id="bottomright">
+<div id="bottomsub4">
 <canvas id="color2" width="29" height="5">
 Your browser does not support the HTML5 canvas tag.
 </canvas>
+</div>
 </div>
 </div>
 </body>
@@ -144,16 +201,15 @@ var map2 = [];
 for(var i = 0; i < 20; i++){
 	map2[i] = null;
 }
-map2[0] = "#ffffff";
 map2[1] = "#000000";
-map2[2] = "#ff0000";
-map2[3] = "#0ff000";
-map2[4] = "#00ff00";
-map2[5] = "#000ff0";
-map2[6] = "#0000ff";
-map2[7] = "#f0000f";
-map2[8] = "#ffff00";
-map2[9] = "#0ffff0";
+map2[2] = "#ffffff";
+map2[3] = "#ff0000";
+map2[4] = "#ffaa00";
+map2[5] = "#ffff00";
+map2[6] = "#00ff00";
+map2[7] = "#00ffff";
+map2[8] = "#0000ff";
+map2[9] = "#ff00ff";
 
 var x = 0;
 var y = 0;
@@ -174,29 +230,24 @@ var zooming = false;
 var interval;
 var color = "#000000";
 
+var cv = document.getElementById("canvas");
+var mid = document.getElementById("mid");
+var pos = document.getElementById("midpos");
+var c1 = document.getElementById("color1");
+var c2 = document.getElementById("color2");
+var red = document.getElementById("Red");
+var green = document.getElementById("Green");
+var blue = document.getElementById("Blue");
+var redtext = document.getElementById("redtext");
+var greentext = document.getElementById("greentext");
+var bluetext = document.getElementById("bluetext");
+
 $(function(){
-	var cv = document.getElementById("canvas");
-	var mid = document.getElementById("mid");
-	var pos = document.getElementById("midpos");
-	var c1 = document.getElementById("color1");
-	var c2 = document.getElementById("color2");
-	
 	var c1x = c1.getContext("2d");
-	c1x.fillRect(0,0,1000,1000);
+	c1x.fillRect(0,0,2,2);
 	
-	var c2x = c2.getContext("2d");
-	c2x.fillStyle = "#eeddee";
-	c2x.fillRect(0,0,30,5);
-	for(var i = 0; i < 20; i++){
-		if(map2[i] != null){
-			c2x.fillStyle = map2[i];
-			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
-		}
-		else{
-			c2x.fillStyle = "#000000";
-			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
-		}
-	}
+	redrawColors(true,c2);
+	
 	var cv2 = cv.getContext("2d");
 	
 	mid.addEventListener("mousemove",function(event){
@@ -217,17 +268,112 @@ $(function(){
 		var index = Math.floor(colorx/3)+(Math.floor(colory/3))*10
 		color = map2[index];
 		if(color == null){
-			color = "#000000";
+			c1x.fillStyle = "#000000";
+			c1x.fillRect(0, 0, 1, 1);
+			c1x.fillRect(1, 1, 1, 1);
+			c1x.fillStyle = "#dddddd";
+			c1x.fillRect(1, 0, 1, 1);
+			c1x.fillRect(0, 1, 1, 1);
+			
+			var n = document.getElementById("colorstring2");
+			var message = "Eraser";
+			n.innerHTML = message;
+			
+			red.value = 0;
+			green.value = 0;
+			blue.value = 0;
+			
+			redtext.innerHTML = "Red: N/A"
+			greentext.innerHTML = "Green: N/A"
+			bluetext.innerHTML = "Blue: N/A"
 		}
+		else{
+			c1x.fillStyle = color;
+			c1x.fillRect(0,0,2,2);
+			
+			var n = document.getElementById("colorstring2");
+			var message = color; 
+			n.innerHTML = message;
+			
+			var r = parseInt(color.substring(1,3), 16);
+			var g = parseInt(color.substring(3,5), 16);
+			var b = parseInt(color.substring(5,7), 16);
+			
+			red.value = r;
+			green.value = g;
+			blue.value = b;
+			
+			redtext.innerHTML = "Red: "+r;
+			greentext.innerHTML = "Green: "+g;
+			bluetext.innerHTML = "Blue: "+b;
+		}
+	});
+	red.oninput = function() {
+		var rt = (parseInt(red.value)).toString(16);
+		var gt = (parseInt(green.value)).toString(16);
+		var bt = (parseInt(blue.value)).toString(16);
+		if(rt == "0"){
+			rt = rt+"0";
+		}
+		if(gt == "0"){
+			gt = gt+"0";
+		}
+		if(bt == "0"){
+			bt = bt+"0";
+		}
+		color = "#"+rt+gt+bt;
 		
 		c1x.fillStyle = color;
-		c1x.fillRect(0,0,1,1);
-		
+		c1x.fillRect(0,0,2,2);
+			
 		var n = document.getElementById("colorstring2");
 		var message = color; 
 		n.innerHTML = message;
+	}
+	green.oninput = function() {
+		var rt = (parseInt(red.value)).toString(16);
+		var gt = (parseInt(green.value)).toString(16);
+		var bt = (parseInt(blue.value)).toString(16);
+		if(rt == "0"){
+			rt = rt+"0";
+		}
+		if(gt == "0"){
+			gt = gt+"0";
+		}
+		if(bt == "0"){
+			bt = bt+"0";
+		}
+		color = "#"+rt+gt+bt;
 		
-	});
+		c1x.fillStyle = color;
+		c1x.fillRect(0,0,2,2);
+			
+		var n = document.getElementById("colorstring2");
+		var message = color; 
+		n.innerHTML = message;
+	}
+	blue.oninput = function() {
+		var rt = (parseInt(red.value)).toString(16);
+		var gt = (parseInt(green.value)).toString(16);
+		var bt = (parseInt(blue.value)).toString(16);
+		if(rt == "0"){
+			rt = rt+"0";
+		}
+		if(gt == "0"){
+			gt = gt+"0";
+		}
+		if(bt == "0"){
+			bt = bt+"0";
+		}
+		color = "#"+rt+gt+bt;
+		
+		c1x.fillStyle = color;
+		c1x.fillRect(0,0,2,2);
+			
+		var n = document.getElementById("colorstring2");
+		var message = color; 
+		n.innerHTML = message;
+	}
 	cv.addEventListener("mousedown",function(event){
 		downx = event.clientX;
 		downy = event.clientY;
@@ -375,8 +521,9 @@ function Zoom(amount){
 };
 function writeMessage(canvas){
 	var ctx = canvas.getContext("2d");
-	ctx.fillStyle = color;
-	
+	if(color != null){
+		ctx.fillStyle = color;
+	}
 	var rect = canvas.getBoundingClientRect();
 	var width = rect.right - rect.left;
 	var height = rect.bottom - rect.top;
@@ -436,12 +583,17 @@ function writeMessage(canvas){
 	}
 	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
 		if(map[mousex][mousey] != color){
-			ctx.fillRect(mousex,mousey,1,1);
+			if(color == null){
+				ctx.clearRect(mousex,mousey,1,1);
+			}
+			else{
+				ctx.fillRect(mousex,mousey,1,1);
+			}
 		}
 	}
 
-	var n = document.getElementById("position");
-	var message = "Mouse Position: "+mousex+" "+mousey+" "; 
+	var n = document.getElementById("colorstring");
+	var message = "x:"+mousex+" y:"+mousey+""; 
 	n.innerHTML = message;
 	
 	var m = document.getElementById("realposition");
@@ -450,11 +602,77 @@ function writeMessage(canvas){
 };
 function drawCanvas(canvas){
 	if(map[mousex][mousey] != color){
-		map[mousex][mousey] = color;
-		var ctx = canvas.getContext("2d");
-		ctx.fillStyle = color;
-		ctx.fillRect(mousex,mousey,1,1);
+		if(color == null){
+			map[mousex][mousey] = color;
+			var ctx = canvas.getContext("2d");
+			ctx.clearRect(mousex,mousey,1,1);
+		}
+		else{
+			var base = false;
+			var prev = color;
+			for(var i = 0; i < 20; i++){
+				if((i > 9) && !base){
+					var temp = map2[i];
+					if(color == prev && i != 10){
+						break;
+					}
+					else{
+						map2[i] = prev;
+					}
+					prev = temp;
+				}
+				else if(map2[i] == color){
+					base = true;
+				}
+			}
+			if(!base){
+				redrawColors(false,c2);
+			}
+		
+			map[mousex][mousey] = color;
+			var ctx = canvas.getContext("2d");
+			ctx.fillStyle = color;
+			ctx.fillRect(mousex,mousey,1,1);
+		}
 	}
 };
+function redrawColors(complete,canvas){
+	if(complete){
+		var c2x = c2.getContext("2d");
+		c2x.fillStyle = "#eeddee";
+		c2x.fillRect(0,0,30,5);
+		for(var i = 0; i < 20; i++){
+			if(map2[i] != null){
+				c2x.fillStyle = map2[i];
+				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
+			}
+			else{
+				c2x.fillStyle = "#000000";
+				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 1, 1);
+				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3+1, 1, 1);
+				c2x.fillStyle = "#dddddd";
+				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3, 1, 1);
+				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3+1, 1, 1);
+			}
+		}
+	}
+	else{
+		var c2x = c2.getContext("2d");
+		for(var i = 10; i < 20; i++){
+			if(map2[i] != null){
+				c2x.fillStyle = map2[i];
+				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
+			}
+			else{
+				c2x.fillStyle = "#000000";
+				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 1, 1);
+				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3+1, 1, 1);
+				c2x.fillStyle = "#dddddd";
+				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3, 1, 1);
+				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3+1, 1, 1);
+			}
+		}
+	}
+}
 </script>
 </html>
