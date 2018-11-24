@@ -1,5 +1,7 @@
 # Canvas
 
+[![Build Status](https://travis-ci.com/Muttsu/canvas.svg?token=bSsqeeizRAWGzy6Uyas7&branch=master)](https://travis-ci.com/Muttsu/canvas)
+
 ## Requirements
 
 [python](https://www.python.org/)
