@@ -1,195 +1,3 @@
-<!doctype html>
-<html>
-<head>
-<script type="text/javascript" src="http://code.jquery.com/jquery.min.js">
-/*body{
-	height:90%;
-	a
-	
-}*/
-</script>
-<style>
-html{
-	height:100vh;
-}
-
-.info{
-	display: inline-block;
-	width: 10%;
-}
-div#top{
-}
-div#mid{
-	image-rendering: pixelated;
-	background-color: gray;
-	width: 100%;
-	height: 90vh;
-	overflow:hidden;
-}
-div#midpos{
-	transform: translate(0px,0px);
-	height: 100%;
-}
-div#midscale{
-	transform: scale(1,1);
-	height: 100%;
-}
-div#bottom{
-}
-div#bottomleft{
-	display: inline-block;
-	width:33%;
-}
-div#bottommid{
-	display: inline-block;
-	width:66%;
-}
-div#bottomsub1{
-	display: inline-block;
-	width: 8%;
-}
-div#bottomsub2{
-	display: inline-block;
-	width: 33%;
-}
-div#bottomsub3{
-	display: inline-block;
-	width: 8%;
-}
-div#bottomsub4{
-	display: inline-block;
-	width:50%;
-}
-div.leftrange{
-	width: 100%;
-}
-.slider{
-	-webkit-appearance: none;
-	width: 75%;
-	height: 5px;
-	border-radius: 2px;
-	background: #dddddd;
-	outline: none;
-	opacity: 0.7;
-	-webkit-transition: .2s;
-	transition: opacity .2s;
-}
-.slider:hover{
-	opacity: 1;
-}
-input#Red::-webkit-slider-thumb{
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 15px;
-	border-radius: 50%;
-    background: #ff0000;
-    cursor: pointer;
-}
-input#Green::-webkit-slider-thumb{
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 15px;
-	border-radius: 50%;
-    background: #00ff00;
-    cursor: pointer;
-}
-input#Blue::-webkit-slider-thumb{
-    -webkit-appearance: none;
-    appearance: none;
-    width: 15px;
-    height: 15px;
-	border-radius: 50%;
-    background: #0000ff;
-    cursor: pointer;
-}
-#canvas{
-	image-rendering: pixelated;
-	background-color: #eeeeee;
-	padding: 0;
-    margin: auto;
-    display: block;
-	height: 100%;
-}
-#color1{
-	image-rendering: pixelated;
-	padding: 0;
-    margin: auto;
-    display: block;
-	width: 7%;
-}
-#color2{
-	image-rendering: pixelated;
-	padding: 0;
-    margin: auto;
-    display: block;
-	width: 40%;
-	transform: translate(0px,3px);
-}
-#colorstring{
-	float: right;
-}
-#colorstring2{
-	float: left;
-}
-</style>
-</head>
-<body>
-<div id="top" height="10%">
-<button class="info" id="zoom" onclick="ZoomIn()">zoom+</button>
-<button class="info" id="zoom2" onclick="ZoomOut()">zoom-</button>
-<span class="info" id="zoomlevel">Zoom: 1x  </span>
-<span class="info" id="translatelevel">Camera Position: 0 0  </span>
-<span class="info" id="position">Mouse Position: 0 0  </span>
-<span id="realposition">Real Mouse Position: 0 0  </span>
-</div>
-<div id="mid">
-<div id="midscale">
-<div id="midpos">
-<canvas id="canvas" width="1000" height="1000">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-</div>
-</div>
-</div>
-<div class="bottom">
-<div id="bottomleft">
-<div class="leftrange">
-<input type="range" min="0" max="255" value="0" class="slider" id="Red">
-<span id="redtext">Red: 0</span>
-</div>
-<div class="leftrange">
-<input type="range" min="0" max="255" value="0" class="slider" id="Green">
-<span id="greentext">Green: 0</span>
-</div>
-<div class="leftrange">
-<input type="range" min="0" max="255" value="0" class="slider" id="Blue">
-<span id="bluetext">Blue: 0</span>
-</div>
-</div>
-<div id="bottommid">
-<div id="bottomsub1">
-<span id="colorstring2">#000000</span>
-
-</div>
-<div id="bottomsub2">
-<canvas id="color1" width="2" height="2">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-</div>
-<div id="bottomsub3">
-<span id="colorstring">#000000</span>
-</div>
-<div id="bottomsub4">
-<canvas id="color2" width="29" height="5">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-</div>
-</div>
-</div>
-</body>
-<script>
 var map = [];
 for(var i = 0; i < 1000; i++){
 	map[i] = [];
@@ -329,6 +137,8 @@ $(function(){
 		var n = document.getElementById("colorstring2");
 		var message = color; 
 		n.innerHTML = message;
+		
+		redtext.innerHTML = "Red: "+red.value;
 	}
 	green.oninput = function() {
 		var rt = (parseInt(red.value)).toString(16);
@@ -351,6 +161,8 @@ $(function(){
 		var n = document.getElementById("colorstring2");
 		var message = color; 
 		n.innerHTML = message;
+		
+		greentext.innerHTML = "Green: "+green.value;
 	}
 	blue.oninput = function() {
 		var rt = (parseInt(red.value)).toString(16);
@@ -373,6 +185,8 @@ $(function(){
 		var n = document.getElementById("colorstring2");
 		var message = color; 
 		n.innerHTML = message;
+		
+		bluetext.innerHTML = "Blue: "+blue.value;
 	}
 	cv.addEventListener("mousedown",function(event){
 		downx = event.clientX;
@@ -637,42 +451,28 @@ function drawCanvas(canvas){
 	}
 };
 function redrawColors(complete,canvas){
+	var range = 0;
+	var c2x = c2.getContext("2d");
 	if(complete){
-		var c2x = c2.getContext("2d");
+		range = 0;
 		c2x.fillStyle = "#eeddee";
 		c2x.fillRect(0,0,30,5);
-		for(var i = 0; i < 20; i++){
-			if(map2[i] != null){
-				c2x.fillStyle = map2[i];
-				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
-			}
-			else{
-				c2x.fillStyle = "#000000";
-				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 1, 1);
-				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3+1, 1, 1);
-				c2x.fillStyle = "#dddddd";
-				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3, 1, 1);
-				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3+1, 1, 1);
-			}
-		}
 	}
 	else{
-		var c2x = c2.getContext("2d");
-		for(var i = 10; i < 20; i++){
-			if(map2[i] != null){
-				c2x.fillStyle = map2[i];
-				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
-			}
-			else{
-				c2x.fillStyle = "#000000";
-				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 1, 1);
-				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3+1, 1, 1);
-				c2x.fillStyle = "#dddddd";
-				c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3, 1, 1);
-				c2x.fillRect((3*i)%30, (Math.floor(i/10))*3+1, 1, 1);
-			}
+		range = 10;
+	}
+	for(var i = range; i < 20; i++){
+		if(map2[i] != null){
+			c2x.fillStyle = map2[i];
+			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
+		}
+		else{
+			c2x.fillStyle = "#000000";
+			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 1, 1);
+			c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3+1, 1, 1);
+			c2x.fillStyle = "#dddddd";
+			c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3, 1, 1);
+			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3+1, 1, 1);
 		}
 	}
 }
-</script>
-</html>
