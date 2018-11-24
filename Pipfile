@@ -12,6 +12,7 @@ pylint = "*"
 flask-jwt-extended = "*"
 pytest = "*"
 gunicorn = "*"
+flask-collect = "*"
 
 [requires]
 python_version = "3.6"
