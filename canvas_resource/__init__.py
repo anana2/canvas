@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask, url_for
 
 app = Flask(__name__)
 
@@ -8,6 +8,10 @@ import canvas_resource.logging
 
 
 @app.route('/')
+def root():
+    return url_for('static', filename='index.html')
+
+@app.route('/greet')
 def greeting():
     return 'Hello, World!'
 
