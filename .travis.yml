@@ -1,17 +1,16 @@
 matrix:
   include:
-    - language: python
-      python:
-        - '3.6'
-      install:
-        - pip install pipenv
-        - pipenv install
-      script:
-        - pytest
-
+  - language: python
+    python:
+    - '3.6'
+    install:
+    - pip install pipenv
+    - pipenv install
+    script:
+    - pytest
 deploy:
   provider: heroku
   api_key:
-    secure: kVkfbqtfuPle6/afNjtyJGHB2yuFRRgpHTenFCP+47PRG5QBnCYmmVWhEO17d4afgr876oY0GJmj5awYU1jbvQFTfp+4wgpzIgTUHS5TQ29pXU3D4XKlYqQ6Taz6WtrBwIjD8IUBnwoXy+QhoyIB2CSnzwdLtf5LPIA9JrJAdBQnEKYqjWeD4oBx/6bDEBv1kfsoENmN8VHMQyFLB5cN8OJVtlP7aPcfgygz6ziqxvn8OwusRGOB975uElWhA+anJ2Z16jbTxypCpkffnzSlf+JKH9xqDwQDtaKDBDgZPaFd9qrVrtlgbV8TQXNnbxuBI9jR+hS/uVFaZVd19BUG7sYbhoHtR0lGjx6bStDjLGZnau53Cg9kMGR4aBtaB4Q8PjXUkAvu7o5aDU/HKaGg8jVE/mWIk9D7wVgGJYyGW5zVvCrWBxnMyxxB0f99v9xH35rh+4u5eEdaw4sfFhzdYmSfsxioNREzX76wWpCUx4S64QTGS1a5u868yhnvl1L7eI2muOE741AcJZKrMKEaHfI+ACWwbWRj3CH3cimI/rgEORC6MylFt324enzyyEf9x5f2XXGfqBbyrqtkQgm58dhFDb7Kpg9hqUbkIJGO7KYuMTsFe+6nzRr9vl7YDaSGGOfozo9EuDqjWvEl1jmBP754irx31Pz+9d/Iwvs8G70=
+    secure: q8r0l8rRLHBniHmedonKGNnjiJ2lQ3mxU3Poqjp6xa0o3IdfQGkARHA+YnwyobyXUStlWknrqAxeCNM/8UJUkMnBAJXpVe5LuV5/oYjjAdlpw0TRjtUi/X/E70B99kCI0OcMTLnEyQJCu28PlBx87su6l6aJbfCBff97qMUiC5mgLOiDvzQOur6BPdkBu+deOZbmFSlrlqEr4IWPkgTTm12ll1qMzpeKcsmlfssIKYlLJZRurtXAlnsokBjv9+lDZ/u/X39WwNfz+dt4OC5OCuF2Qni5+gE89CldlYdmNCXb6ozUcax+29NbHzSPsWjtWibroTmsp7xKHXSR+7RyA5w8N4tJQkqwAj/51DLjIbas+Bj2Mx5QN/Um2DsoPaGDW6ycLVczoDag74fwZ6KpzAfU/arRF3FbXPHFtlzYm/bbMWp5ZcgkPAhUDaFlSeuOoxMomdGm2A+rIPVNt8yMXsn5kmg1dSJF5NBKh6Wwzyz3Fyq1zCKMhdgxkpgSpgwJW7kRHtInZem0Bg1Yc+Razwpuv0uiqLQXpUGwm6S9VoIBcM+2lqb64lmn2DFj/mSXLjDJnSZ075Tmea7AfFkB07O6ilXEWW2nnSshRlGo0YzPHO3zetZKHriZ9qMDJr8o1+GGMnzUKCUkRBl69sQrhsV/QqObv7Jms7Svh0svJUU=
   app:
     master: copm307p1-staging
