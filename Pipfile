@@ -11,6 +11,8 @@ colorama = "*"
 pylint = "*"
 flask-jwt-extended = "*"
 pytest = "*"
+gunicorn = "*"
+fcntl = "*"
 
 [requires]
 python_version = "3.6"
