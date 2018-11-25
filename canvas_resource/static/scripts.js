@@ -86,52 +86,46 @@ $(function(){
 		var rt = (parseInt(red.value)).toString(16);
 		var gt = (parseInt(green.value)).toString(16);
 		var bt = (parseInt(blue.value)).toString(16);
-		if(rt == "0"){
-			rt = rt+"0";
+		if(rt.length == 1){
+			rt = "0"+rt;
 		}
-		if(gt == "0"){
-			gt = gt+"0";
+		if(gt.length == 1){
+			gt = "0"+gt;
 		}
-		if(bt == "0"){
-			bt = bt+"0";
+		if(bt.length == 1){
+			bt = "0"+bt;
 		}
 		changeColor("#"+rt+gt+bt);
-		
-		redtext.innerHTML = "Red: "+red.value;
 	}
 	green.oninput = function() {
 		var rt = (parseInt(red.value)).toString(16);
 		var gt = (parseInt(green.value)).toString(16);
 		var bt = (parseInt(blue.value)).toString(16);
-		if(rt == "0"){
-			rt = rt+"0";
+		if(rt.length == 1){
+			rt = "0"+rt;
 		}
-		if(gt == "0"){
-			gt = gt+"0";
+		if(gt.length == 1){
+			gt = "0"+gt;
 		}
-		if(bt == "0"){
-			bt = bt+"0";
+		if(bt.length == 1){
+			bt = "0"+bt;
 		}
 		changeColor("#"+rt+gt+bt);
-		
-		greentext.innerHTML = "Green: "+green.value;
 	}
 	blue.oninput = function() {
 		var rt = (parseInt(red.value)).toString(16);
 		var gt = (parseInt(green.value)).toString(16);
 		var bt = (parseInt(blue.value)).toString(16);
-		if(rt == "0"){
-			rt = rt+"0";
+		if(rt.length == 1){
+			rt = "0"+rt;
 		}
-		if(gt == "0"){
-			gt = gt+"0";
+		if(gt.length == 1){
+			gt = "0"+gt;
 		}
-		if(bt == "0"){
-			bt = bt+"0";
+		if(bt.length == 1){
+			bt = "0"+bt;
 		}
 		changeColor("#"+rt+gt+bt);
-		
-		bluetext.innerHTML = "Blue: "+blue.value;
 	}
 	cv.addEventListener("mousedown",function(event){
 		downx = event.clientX;
