@@ -4,13 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
 
 [packages]
 flask = "*"
 colorama = "*"
-pylint = "*"
 flask-jwt-extended = "*"
-pytest = "*"
 gunicorn = "*"
 flask-collect = "*"
 
