@@ -231,27 +231,35 @@ function ZoomOut(){
 	}
 };
 function Zoom(amount){
-	if(z<3 && amount>0){
-		z = (Math.round((z+(amount*0.1))*10))/10;
-	}
-	else if(z<3.5 && amount<0){
-		z = (Math.round((z+(amount*0.1))*10))/10;
-	}
-	else if(z>15.5 && amount>0){
-		z = z+(2*amount);
-	}
-	else if(z>16 && amount<0){
-		z = z+(2*amount);
-	}
-	else if(z>31.5 && amount>0){
-		z = z+(4*amount);
-	}
-	else if(z>32 && amount<0){
-		z = z+(4*amount);
+	if(amount>0){
+		if(z<2){
+			z = (Math.round((z+(amount*0.1))*10))/10;
+		}
+		else if(z<16){
+			z = z+amount;
+		}
+		else if(z < 32){
+			z = z+(2*amount);
+		}
+		else{
+			z = z+(4*amount);
+		}
 	}
 	else{
-		z = z+amount;
+		if(z<2.5){
+			z = (Math.round((z+(amount*0.1))*10))/10;
+		}
+		else if(z<16.5){
+			z = z+amount;
+		}
+		else if(z < 32.5){
+			z = z+(2*amount);
+		}
+		else{
+			z = z+(4*amount);
+		}
 	}
+	
 	if(z > 64){
 		z = 64;
 	}
@@ -360,7 +368,7 @@ function writeMessage(canvas){
 						greentext.innerHTML = "Green: "+g;
 						bluetext.innerHTML = "Blue: "+b;
 					}
-					else{
+					else if(map[tempx][tempy] != null){
 						c1x.fillStyle = "#bbbbbb";
 						c1x.fillRect(0, 0, 1, 1);
 						c1x.fillRect(1, 1, 1, 1);
@@ -381,6 +389,7 @@ function writeMessage(canvas){
 					}
 				}
 				else{
+					ctx.fillStyle = color;
 					ctx.fillRect(mousex,mousey,1,1);
 				}
 			}
@@ -393,9 +402,7 @@ function writeMessage(canvas){
 function drawCanvas(canvas){
 	if(color == "sampler" || color != map[mousex][mousey]){
 		if(color == null){
-			map[mousex][mousey] = color;
-			var ctx = canvas.getContext("2d");
-			ctx.clearRect(mousex,mousey,1,1);
+			fill(mousex,mousey,color);
 		}
 		else if(color == "sampler"){
 			if(map[mousex][mousey] != null){
@@ -423,14 +430,22 @@ function drawCanvas(canvas){
 			if(!base){
 				redrawColors(false,c2);
 			}
-		
-			map[mousex][mousey] = color;
-			var ctx = canvas.getContext("2d");
-			ctx.fillStyle = color;
-			ctx.fillRect(mousex,mousey,1,1);
+			
+			fill(mousex,mousey,color);
 		}
 	}
 };
+function fill(xpos,ypos,c){
+	map[xpos][ypos] = c;
+	var ctx = canvas.getContext("2d");
+	if(c == null){
+		ctx.clearRect(xpos,ypos,1,1);
+	}
+	else{
+		ctx.fillStyle = c;
+		ctx.fillRect(xpos,ypos,1,1);
+	}
+}
 function redrawColors(complete,canvas){
 	var range = 0;
 	var end = 20;
