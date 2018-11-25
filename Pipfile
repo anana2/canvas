@@ -15,3 +15,6 @@ flask-collect = "*"
 
 [requires]
 python_version = "3.6"
+
+[scripts]
+backend = "flask run"
