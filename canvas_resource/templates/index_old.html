@@ -1,25 +1,23 @@
 <!doctype html>
 <html>
 <head>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <style>
 html{
 	height:100%;
 }
-
+body{
+	height:90%;
+}
 .info{
 	display: inline-block;
 	width: 10%;
-}
-div#top{
-	height: 5%
 }
 div#mid{
 	image-rendering: pixelated;
 	background-color: gray;
 	width: 100%;
-	height: 90%;
+	height: 100%;
 	overflow:hidden;
 }
 div#midpos{
@@ -30,72 +28,19 @@ div#midscale{
 	transform: scale(1,1);
 	height: 100%;
 }
-div#bottom{
-	image-rendering: pixelated;
-	height: 5%;
-}
-div#bottomleft{
-	display: inline-block;
-	width:33%;
-	height: 100%;
-}
-div#bottommid{
-	display: inline-block;
-	width:33%;
-	height: 100%;
-}
-div#bottomright{
-	display: inline-block;
-	width:33%;
-	height: 100%;
-}
-div#bottomsub1{
-	display: inline-block;
-	width: 16%;
-}
-div#bottomsub{
-	display: inline-block;
-	width: 66%;
-}
-div#bottomsub2{
-	display: inline-block;
-	width: 16%;
-}
 #canvas{
-	image-rendering: pixelated;
 	background-color: #eeeeee;
 	padding: 0;
     margin: auto;
     display: block;
 	height: 100%;
 }
-#color1{
-	padding: 0;
-    margin: auto;
-    display: block;
-	width: 7%;
-	transform: translate(0px,3px);
-}
-#color2{
-	image-rendering: pixelated;
-	padding: 0;
-    margin: auto;
-    display: block;
-	width: 40%;
-	transform: translate(0px,3px);
-}
-#colorstring{
-	float: right;
-}
-#colorstring2{
-	float: left;
-}
 </style>
 </head>
 <body>
-<div id="top" height="10%">
-<button class="info" id="zoom" onclick="ZoomIn()">zoom+</button>
-<button class="info" id="zoom2" onclick="ZoomOut()">zoom-</button>
+<div class="top" height="10%">
+<button  class="info" id="zoom" onclick="ZoomIn()">zoom+</button>
+<button  class="info" id="zoom2" onclick="ZoomOut()">zoom-</button>
 <span class="info" id="zoomlevel">Zoom: 1x  </span>
 <span class="info" id="translatelevel">Camera Position: 0 0  </span>
 <span class="info" id="position">Mouse Position: 0 0  </span>
@@ -110,26 +55,7 @@ Your browser does not support the HTML5 canvas tag.
 </div>
 </div>
 </div>
-<div class="bottom">
-<div id="bottomleft"></div>
-<div id="bottommid">
-<div id="bottomsub1">
-<span id="colorstring">#000000</span>
-</div>
-<div id="bottomsub">
-<canvas id="color1" width="1" height="1">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-</div>
-<div id="bottomsub2">
-<span id="colorstring2">#000000</span>
-</div>
-</div>
-<div id="bottomright">
-<canvas id="color2" width="29" height="5">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-</div>
+<div class="bottom" height="10%">
 </div>
 </body>
 <script>
@@ -137,24 +63,9 @@ var map = [];
 for(var i = 0; i < 1000; i++){
 	map[i] = [];
 	for(var j = 0; j < 1000; j++){
-		map[i][j] = null;
+		map[i][j] = false;
 	}
 }
-var map2 = [];
-for(var i = 0; i < 20; i++){
-	map2[i] = null;
-}
-map2[0] = "#ffffff";
-map2[1] = "#000000";
-map2[2] = "#ff0000";
-map2[3] = "#0ff000";
-map2[4] = "#00ff00";
-map2[5] = "#000ff0";
-map2[6] = "#0000ff";
-map2[7] = "#f0000f";
-map2[8] = "#ffff00";
-map2[9] = "#0ffff0";
-
 var x = 0;
 var y = 0;
 var z = 1;
@@ -172,61 +83,17 @@ var drawing = true;
 var moving = false;
 var zooming = false;
 var interval;
-var color = "#000000";
 
 $(function(){
 	var cv = document.getElementById("canvas");
 	var mid = document.getElementById("mid");
 	var pos = document.getElementById("midpos");
-	var c1 = document.getElementById("color1");
-	var c2 = document.getElementById("color2");
 	
-	var c1x = c1.getContext("2d");
-	c1x.fillRect(0,0,1000,1000);
-	
-	var c2x = c2.getContext("2d");
-	c2x.fillStyle = "#eeddee";
-	c2x.fillRect(0,0,30,5);
-	for(var i = 0; i < 20; i++){
-		if(map2[i] != null){
-			c2x.fillStyle = map2[i];
-			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
-		}
-		else{
-			c2x.fillStyle = "#000000";
-			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
-		}
-	}
 	var cv2 = cv.getContext("2d");
-	
 	mid.addEventListener("mousemove",function(event){
 		if(!zooming){
 			writeMessage(cv);
 		}
-	});
-	c2.addEventListener("click",function(event){
-		var rect = c2.getBoundingClientRect();
-		var width = rect.right - rect.left;
-		var height = rect.bottom - rect.top;
-		var multx = width/29;
-		var multy = height/5;
-	
-		var colorx = Math.floor((event.clientX - rect.left)/multx);
-		var colory = Math.floor((event.clientY - rect.top)/multy);
-		
-		var index = Math.floor(colorx/3)+(Math.floor(colory/3))*10
-		color = map2[index];
-		if(color == null){
-			color = "#000000";
-		}
-		
-		c1x.fillStyle = color;
-		c1x.fillRect(0,0,1,1);
-		
-		var n = document.getElementById("colorstring2");
-		var message = color; 
-		n.innerHTML = message;
-		
 	});
 	cv.addEventListener("mousedown",function(event){
 		downx = event.clientX;
@@ -375,7 +242,6 @@ function Zoom(amount){
 };
 function writeMessage(canvas){
 	var ctx = canvas.getContext("2d");
-	ctx.fillStyle = color;
 	
 	var rect = canvas.getBoundingClientRect();
 	var width = rect.right - rect.left;
@@ -385,10 +251,8 @@ function writeMessage(canvas){
 	
 	var tempx = mousex;
 	var tempy = mousey;
-	
 	realmousex = (event.clientX - rect.left)/multx;
 	realmousey = (event.clientY - rect.top)/multy;
-	
 	mousex = Math.floor(realmousex);
 	mousey = Math.floor(realmousey);
 	
@@ -397,8 +261,8 @@ function writeMessage(canvas){
 		diffy = realmousey-clicky;
 	
 		var div = document.getElementById("midpos");
-		x = x+(multx*diffx/z);
-		y = y+(multy*diffy/z);
+		x = x+(diffx);
+		y = y+(diffy);
 	
 		if(x<(-500*multx/z)){
 			x = -500*multx/z;
@@ -423,19 +287,15 @@ function writeMessage(canvas){
 		var message = "Camera Position: "+Math.floor(x)+" "+Math.floor(y)+"  ";  
 		n.innerHTML = message;
 	}
-	else if(tempx != mousex || tempy != mousey){
+	else{
 		if(tempx > -1 && tempx < 1000 && tempy > -1 && tempy < 1000){
-			if(map[tempx][tempy] == null){
+			if(!map[tempx][tempy]){
 				ctx.clearRect(tempx,tempy,1,1);
-			}
-			else{
-				ctx.fillStyle = map[tempx][tempy];
-				ctx.fillRect(tempx,tempy,1,1);
 			}
 		}
 	}
 	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
-		if(map[mousex][mousey] != color){
+		if(!map[mousex][mousey]){
 			ctx.fillRect(mousex,mousey,1,1);
 		}
 	}
@@ -449,10 +309,9 @@ function writeMessage(canvas){
 	m.innerHTML = message;
 };
 function drawCanvas(canvas){
-	if(map[mousex][mousey] != color){
-		map[mousex][mousey] = color;
+	if(!map[mousex][mousey]){
+		map[mousex][mousey] = true;
 		var ctx = canvas.getContext("2d");
-		ctx.fillStyle = color;
 		ctx.fillRect(mousex,mousey,1,1);
 	}
 };
