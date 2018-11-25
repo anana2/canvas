@@ -43,6 +43,7 @@ var cv = document.getElementById("canvas");
 var mid = document.getElementById("mid");
 var pos = document.getElementById("midpos");
 var sca = document.getElementById("midscale");
+var zoomlevel = document.getElementById("zoomlevel");
 var c1 = document.getElementById("color1");
 var c2 = document.getElementById("color2");
 
@@ -207,9 +208,8 @@ function ZoomIn(){
 	}
 	sca.style.transform = "scale("+z+","+z+")";
 	
-	var n = document.getElementById("zoomlevel");
 	var message = "Zoom: "+z+"x  "; 
-	n.innerHTML = message;
+	zoomlevel.innerHTML = message;
 };
 function ZoomOut(){
 	z = z/2;
@@ -218,14 +218,12 @@ function ZoomOut(){
 	}
 	sca.style.transform = "scale("+z+","+z+")";
 	
-	var n = document.getElementById("zoomlevel");
 	var message = "Zoom: "+z+"x  "; 
-	n.innerHTML = message;
+	zoomlevel.innerHTML = message;
 	
-	var cv = document.getElementById("canvas");
 	var ctx = cv.getContext("2d");
 	if(mousex > -1 && mousex < 1000 && mousey > -1 && mousey < 1000){
-		if(!map[mousex][mousey]){
+		if(map[mousex][mousey] == null){
 			ctx.clearRect(mousex,mousey,1,1);
 		}
 	}
@@ -269,11 +267,9 @@ function Zoom(amount){
 	else{
 		sca.style.transform = "scale("+z+","+z+")";
 	
-		var n = document.getElementById("zoomlevel");
 		var message = "Zoom: "+z+"x  "; 
-		n.innerHTML = message;
+		zoomlevel.innerHTML = message;
 	
-		var cv = document.getElementById("canvas");
 		writeMessage(cv);
 	}
 };
@@ -324,10 +320,6 @@ function writeMessage(canvas){
 		realmousey = realmousey-diffy;
 		mousex = Math.floor(realmousex);
 		mousey = Math.floor(realmousey);
-	
-		var n = document.getElementById("translatelevel");
-		var message = "Camera Position: "+Math.floor(x)+" "+Math.floor(y)+"  ";  
-		n.innerHTML = message;
 	}
 	else if(tempx != mousex || tempy != mousey){
 		if(tempx > -1 && tempx < 1000 && tempy > -1 && tempy < 1000){
