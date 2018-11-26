@@ -2,23 +2,23 @@ var map = [];
 for(var i = 0; i < 100; i++){
 	map[i] = [];
 	for(var j = 0; j < 100; j++){
-		map[i][j] = "#ffffff";
+		map[i][j] = null;
 	}
 }
 var map2 = [];
 for(var i = 0; i < 20; i++){
-	map2[i] = null;
+	map2[i] = "sampler";
 }
-map2[0] = "#ffffff";
-map2[1] = "#000000";
+map2[0] = "#000000";
+map2[1] = "#ffffff";
 map2[2] = "#ff0000";
-map2[3] = "#ff6e00";
+map2[3] = "#ffaa00";
 map2[4] = "#ffff00";
 map2[5] = "#00ff00";
 map2[6] = "#00ffff";
-map2[7] = "#006eff";
-map2[8] = "#0000ff";
-map2[9] = "#ff00ff";
+map2[7] = "#0000ff";
+map2[8] = "#ff00ff";
+map2[9] = null;
 
 var x = 0;
 var y = 0;
@@ -63,10 +63,8 @@ $(function(){
 	redrawColors(true,c2);
 	
 	var cv2 = cv.getContext("2d");
-	cv2.fillStyle = "#ffffff";
-	cv2.fillRect(0,0,100,100);
 	
-	addEventListener("mousemove",function(event){
+	mid.addEventListener("mousemove",function(event){
 		if(!zooming){
 			writeMessage(cv);
 		}
@@ -86,9 +84,9 @@ $(function(){
 		changeColor(map2[index]);
 	});
 	red.oninput = function() {
-		var rt = (Math.ceil(parseInt(red.value) * 36.4)).toString(16);
-		var gt = (Math.ceil(parseInt(green.value) * 36.4)).toString(16);
-		var bt = (Math.ceil(parseInt(blue.value) * 85)).toString(16);
+		var rt = (parseInt(red.value)).toString(16);
+		var gt = (parseInt(green.value)).toString(16);
+		var bt = (parseInt(blue.value)).toString(16);
 		if(rt.length == 1){
 			rt = "0"+rt;
 		}
@@ -101,9 +99,9 @@ $(function(){
 		changeColor("#"+rt+gt+bt);
 	}
 	green.oninput = function() {
-		var rt = (Math.ceil(parseInt(red.value) * 36.4)).toString(16);
-		var gt = (Math.ceil(parseInt(green.value) * 36.4)).toString(16);
-		var bt = (Math.ceil(parseInt(blue.value) * 85)).toString(16);
+		var rt = (parseInt(red.value)).toString(16);
+		var gt = (parseInt(green.value)).toString(16);
+		var bt = (parseInt(blue.value)).toString(16);
 		if(rt.length == 1){
 			rt = "0"+rt;
 		}
@@ -116,9 +114,9 @@ $(function(){
 		changeColor("#"+rt+gt+bt);
 	}
 	blue.oninput = function() {
-		var rt = (Math.ceil(parseInt(red.value) * 36.4)).toString(16);
-		var gt = (Math.ceil(parseInt(green.value) * 36.4)).toString(16);
-		var bt = (Math.ceil(parseInt(blue.value) * 85)).toString(16);
+		var rt = (parseInt(red.value)).toString(16);
+		var gt = (parseInt(green.value)).toString(16);
+		var bt = (parseInt(blue.value)).toString(16);
 		if(rt.length == 1){
 			rt = "0"+rt;
 		}
@@ -325,59 +323,61 @@ function writeMessage(canvas){
 	}
 	else if(tempx != mousex || tempy != mousey){
 		if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
-			if(color != map[tempx][tempy]){
+			if(map[tempx][tempy] == null){
+				ctx.clearRect(tempx,tempy,1,1);
+			}
+			else if(color != "sampler"){
 				ctx.fillStyle = map[tempx][tempy];
 				ctx.fillRect(tempx,tempy,1,1);
 			}
-			
 		}
 	}
 	if(tempx != mousex || tempy != mousey){
 		if(mousex > -1 && mousex < 100 && mousey > -1 && mousey < 100){
 			if(map[mousex][mousey] != color){
 				if(color == null){
-					if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
-						if(map[mousex][mousey] != map[tempx][tempy]){
-							console.log("this");
-							c1x.fillStyle = map[mousex][mousey];
-							c1x.fillRect(0,0,2,2);
-							
-							var tempcolor = map[mousex][mousey];
-							var message = "Sampler: " + tempcolor; 
-							colortext.innerHTML = message;
-					
-							var r = Math.round((parseInt(tempcolor.substring(1,3), 16))/36.4);
-							var g = Math.round((parseInt(tempcolor.substring(3,5), 16))/36.4);
-							var b = Math.round((parseInt(tempcolor.substring(5,7), 16))/85);
-							
-							red.value = r;
-							green.value = g;
-							blue.value = b;
-							
-							redtext.innerHTML = "R: "+r;
-							greentext.innerHTML = "G: "+g;
-							bluetext.innerHTML = "B: "+b;
-						}
-					}
-					else{
+					ctx.clearRect(mousex,mousey,1,1);
+				}
+				else if(color == "sampler"){
+					if(map[mousex][mousey] != null){
+						console.log("this");
 						c1x.fillStyle = map[mousex][mousey];
 						c1x.fillRect(0,0,2,2);
 						
 						var tempcolor = map[mousex][mousey];
 						var message = "Sampler: " + tempcolor; 
 						colortext.innerHTML = message;
+				
+						var r = parseInt(tempcolor.substring(1,3), 16);
+						var g = parseInt(tempcolor.substring(3,5), 16);
+						var b = parseInt(tempcolor.substring(5,7), 16);
 						
-						var r = Math.round((parseInt(tempcolor.substring(1,3), 16))/36.4);
-						var g = Math.round((parseInt(tempcolor.substring(3,5), 16))/36.4);
-						var b = Math.round((parseInt(tempcolor.substring(5,7), 16))/85);
-							
 						red.value = r;
 						green.value = g;
 						blue.value = b;
-							
-						redtext.innerHTML = "R: "+r;
-						greentext.innerHTML = "G: "+g;
-						bluetext.innerHTML = "B: "+b;
+						
+						redtext.innerHTML = "Red: "+r;
+						greentext.innerHTML = "Green: "+g;
+						bluetext.innerHTML = "Blue: "+b;
+					}
+					else if(map[tempx][tempy] != null){
+						c1x.fillStyle = "#bbbbbb";
+						c1x.fillRect(0, 0, 1, 1);
+						c1x.fillRect(1, 1, 1, 1);
+						c1x.fillStyle = "#000000";
+						c1x.fillRect(1, 0, 1, 1);
+						c1x.fillRect(0, 1, 1, 1);
+						
+						var message = "Sampler"; 
+						colortext.innerHTML = message;
+						
+						red.value = 0;
+						green.value = 0;
+						blue.value = 0;
+						
+						redtext.innerHTML = "Red: N/A";
+						greentext.innerHTML = "Green: N/A";
+						bluetext.innerHTML = "Blue: N/A";
 					}
 				}
 				else{
@@ -385,28 +385,6 @@ function writeMessage(canvas){
 					ctx.fillRect(mousex,mousey,1,1);
 				}
 			}
-		}
-		else if(color == null && (tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100)){
-			c1x.fillStyle = "#bbbbbb";
-			c1x.fillRect(0, 0, 1, 1);
-			c1x.fillRect(1, 1, 1, 1);
-			c1x.fillStyle = "#000000";
-			c1x.fillRect(1, 0, 1, 1);
-			c1x.fillRect(0, 1, 1, 1);
-						
-			var message = "Sampler"; 
-			colortext.innerHTML = message;
-						
-			red.value = 0;
-			green.value = 0;
-			blue.value = 0;
-						
-			redtext.innerHTML = "R: N/A";
-			greentext.innerHTML = "G: N/A";
-			bluetext.innerHTML = "B: N/A";
-		}
-		else{
-			
 		}
 	}
 
@@ -416,7 +394,12 @@ function writeMessage(canvas){
 function drawCanvas(canvas){
 	if(color == "sampler" || color != map[mousex][mousey]){
 		if(color == null){
-			changeColor(map[mousex][mousey]);
+			fill(mousex,mousey,color);
+		}
+		else if(color == "sampler"){
+			if(map[mousex][mousey] != null){
+				changeColor(map[mousex][mousey]);
+			}
 		}
 		else{
 			var base = false;
@@ -471,6 +454,14 @@ function redrawColors(complete,canvas){
 	}
 	for(var i = range; i < end; i++){
 		if(map2[i] == null){
+			c2x.fillStyle = "#000000";
+			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 1, 1);
+			c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3+1, 1, 1);
+			c2x.fillStyle = "#dddddd";
+			c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3, 1, 1);
+			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3+1, 1, 1);
+		}
+		else if(map2[i] == "sampler"){
 			c2x.fillStyle = "#bbbbbb";
 			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 1, 1);
 			c2x.fillRect((3*i)%30+1, (Math.floor(i/10))*3+1, 1, 1);
@@ -487,24 +478,37 @@ function redrawColors(complete,canvas){
 function changeColor(c){
 	color = c;
 	var c1x = c1.getContext("2d");
-	if(color == null){
-		c1x.fillStyle = "#bbbbbb";
-		c1x.fillRect(0, 0, 1, 1);
-		c1x.fillRect(1, 1, 1, 1);
-		c1x.fillStyle = "#000000";
-		c1x.fillRect(1, 0, 1, 1);
-		c1x.fillRect(0, 1, 1, 1);
+	if(color == null || color == "sampler"){
+		if(color == null){
+			c1x.fillStyle = "#000000";
+			c1x.fillRect(0, 0, 1, 1);
+			c1x.fillRect(1, 1, 1, 1);
+			c1x.fillStyle = "#dddddd";
+			c1x.fillRect(1, 0, 1, 1);
+			c1x.fillRect(0, 1, 1, 1);
 			
-		var message = "Sampler";
-		colortext.innerHTML = message;
+			var message = "Eraser";
+			colortext.innerHTML = message;
+		}
+		else{
+			c1x.fillStyle = "#bbbbbb";
+			c1x.fillRect(0, 0, 1, 1);
+			c1x.fillRect(1, 1, 1, 1);
+			c1x.fillStyle = "#000000";
+			c1x.fillRect(1, 0, 1, 1);
+			c1x.fillRect(0, 1, 1, 1);
+			
+			var message = "Sampler";
+			colortext.innerHTML = message;
+		}
 		
 		red.value = 0;
 		green.value = 0;
 		blue.value = 0;
 		
-		redtext.innerHTML = "R: N/A"
-		greentext.innerHTML = "G: N/A"
-		bluetext.innerHTML = "B: N/A"
+		redtext.innerHTML = "Red: N/A"
+		greentext.innerHTML = "Green: N/A"
+		bluetext.innerHTML = "Blue: N/A"
 	}
 	else{
 		c1x.fillStyle = color;
@@ -513,16 +517,16 @@ function changeColor(c){
 		var message = color; 
 		colortext.innerHTML = message;
 		
-		var r = Math.round((parseInt(color.substring(1,3), 16))/36.4);
-		var g = Math.round((parseInt(color.substring(3,5), 16))/36.4);
-		var b = Math.round((parseInt(color.substring(5,7), 16))/85);
+		var r = parseInt(color.substring(1,3), 16);
+		var g = parseInt(color.substring(3,5), 16);
+		var b = parseInt(color.substring(5,7), 16);
 		
 		red.value = r;
 		green.value = g;
 		blue.value = b;
 		
-		redtext.innerHTML = "R: "+r;
-		greentext.innerHTML = "G: "+g;
-		bluetext.innerHTML = "B: "+b;
+		redtext.innerHTML = "Red: "+r;
+		greentext.innerHTML = "Green: "+g;
+		bluetext.innerHTML = "Blue: "+b;
 	}	
 };
