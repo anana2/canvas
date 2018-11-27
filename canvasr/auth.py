@@ -1,21 +1,19 @@
-from canvas_resource import app
-
 import logging
 
-from flask import jsonify, request
+from flask import Blueprint, jsonify, request, g
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
-from flask_redis import FlaskRedis
 from argon2 import PasswordHasher
 
-jwt = JWTManager(app)
-store = FlaskRedis(app)
+from canvasr import store, log
+
+bp = Blueprint('auth', __name__)
 ph = PasswordHasher()
 
 log = logging.getLogger('flask.app.auth')
 log.setLevel(logging.DEBUG)
 
 
-@app.route('/login', methods=['POST'])
+@bp.route('/login', methods=['POST'])
 def login():
     if not request.is_json:
         return jsonify(msg='missing request data'), 400
@@ -48,7 +46,7 @@ def login():
     return jsonify(access_token=create_access_token(user)), 200
 
 
-@app.route('/register', methods=['POST'])
+@bp.route('/register', methods=['POST'])
 def register():
     if not request.is_json:
         return jsonify(msg='missing request data'), 400

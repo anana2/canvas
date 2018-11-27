@@ -1,1 +1,1 @@
-web: gunicorn canvas_resource:app
+web: gunicorn canvasr:create_app
