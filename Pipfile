@@ -5,6 +5,8 @@ verify_ssl = true
 
 [dev-packages]
 pytest = "*"
+pylint = "*"
+mockredispy = "*"
 
 [packages]
 flask = "*"
@@ -12,6 +14,8 @@ colorama = "*"
 flask-jwt-extended = "*"
 gunicorn = "*"
 flask-collect = "*"
+flask-redis = "*"
+argon2-cffi = "*"
 
 [requires]
 python_version = "3.6"
