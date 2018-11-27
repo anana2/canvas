@@ -13,3 +13,18 @@
 install the project package with `pipenv install`
 
 create a new branch before doing commiting any changes!
+
+## Running the Debug Server
+
+setting up your envs:
+
+```bash
+echo FLASK_APP=canvasr >> .env
+echo FLASK_ENV=development >> .env
+```
+
+starting the server
+
+``` bash
+pipenv run backend
+```
