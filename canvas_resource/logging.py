@@ -9,7 +9,7 @@ from logging.config import dictConfig
 
 init(autoreset=True)
 
-app.logger.removeHandler(default_handler)
+app.logger.removeHandler(default_handler) #pylint: disable=E1101
 logging.getLogger('werkzeug')
 
 dictConfig({
@@ -53,7 +53,7 @@ def log_request(response):
     elif status >= 200:
         status_color = Fore.GREEN
 
-    app.logger.info("{ip} > {code} {meth:6} {path}".format(
+    app.logger.info("{ip} > {code} {meth:6} {path}".format( #pylint: disable=E1101
         ip=Fore.LIGHTBLACK_EX+ip,
         code=status_color+str(status),
         meth=Fore.LIGHTWHITE_EX+request.method,
