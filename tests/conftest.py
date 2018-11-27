@@ -9,4 +9,4 @@ def client(app):
 
 @pytest.fixture
 def app():
-    return create_app()
+    return create_app(TESTING=True)

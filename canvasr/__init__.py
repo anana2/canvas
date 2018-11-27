@@ -1,6 +1,7 @@
 from flask import Flask, render_template, current_app, g
 from flask_collect import Collect
 from flask_redis import FlaskRedis
+from mockredis import MockRedis
 from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
 
@@ -22,6 +23,8 @@ def create_app(**kwargs):
     collect.init_app(app)
 
     # redis store
+    if app.testing:
+        store.provider_class = MockRedis
     store.init_app(app)
 
     # jwt manager
