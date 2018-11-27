@@ -53,7 +53,7 @@ def log_request(response):
     elif status >= 200:
         status_color = Fore.GREEN
 
-    app.logger.info("{ip:>20} > {code} {meth:6} {path}".format(
+    app.logger.info("{ip} > {code} {meth:6} {path}".format(
         ip=Fore.LIGHTBLACK_EX+ip,
         code=status_color+str(status),
         meth=Fore.LIGHTWHITE_EX+request.method,
