@@ -2,12 +2,13 @@ from flask import Flask, render_template
 from flask_collect import Collect
 
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('flask_config.py')
 
 # static file collection
 collect = Collect(app)
 
 import canvas_resource.logging
+import canvas_resource.auth
 
 
 @app.route('/')

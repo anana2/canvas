@@ -7,5 +7,9 @@ from canvas_resource import app, auth
 def client():
     return app.test_client()
 
-def test_redis():
+def test_redis(client):
     assert auth.store.ping()
+
+
+def test_auth(client):
+    client.post('/login')

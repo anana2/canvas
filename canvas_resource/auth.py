@@ -1,4 +1,7 @@
 from canvas_resource import app
+
+import logging
+
 from flask import jsonify, request
 from flask_jwt_extended import JWTManager, create_access_token
 from flask_redis import FlaskRedis
@@ -8,7 +11,7 @@ jwt = JWTManager(app)
 store = FlaskRedis(app)
 ph = PasswordHasher()
 
-@jwt.user_claims_loader
+log = logging.getLogger('flask.app.auth')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -24,7 +27,7 @@ def login():
     if pasw is None:
         return 'missing pasw in request', 400
 
-    hash = store.get(f'hash:{user}', default='')
+    hash = store.get(f'hash:{user}')
 
     try:
         ph.verify(hash, pasw)
