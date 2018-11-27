@@ -3,7 +3,7 @@ from canvas_resource import app
 import logging
 
 from flask import jsonify, request
-from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
 from flask_redis import FlaskRedis
 from argon2 import PasswordHasher
 
@@ -12,45 +12,62 @@ store = FlaskRedis(app)
 ph = PasswordHasher()
 
 log = logging.getLogger('flask.app.auth')
+log.setLevel(logging.DEBUG)
+
 
 @app.route('/login', methods=['POST'])
 def login():
     if not request.is_json:
-        return 'missing request data', 400
+        return jsonify(msg='missing request data'), 400
 
     data = request.get_json()
+    if 'user' not in data:
+        return jsonify(msg='missing user in request'), 400
+    if 'pasw' not in data:
+        return 'missing pasw in request', 400
+
     user = data['user']
     pasw = data['pasw']
 
-    if user is None:
-        return 'missing user in request', 400
-    if pasw is None:
-        return 'missing pasw in request', 400
-
     hash = store.get(f'hash:{user}')
+
+    if not hash:
+        return jsonify(msg="user doesn't exists"), 404
 
     try:
         ph.verify(hash, pasw)
     except:
-        return 'wrong pasw', 400
+        return jsonify(msg='wrong pasw'), 401
 
-    if ph.check_needs_rehash(hash):
+    log.debug(hash)
+
+    if ph.check_needs_rehash(hash.decode('utf-8')):
         hash = ph.hash(pasw)
         store.set(f'hash:{user}', hash)
 
-    return jsonify(token=create_access_token(user)), 200
+    return jsonify(access_token=create_access_token(user)), 200
 
 
 @app.route('/register', methods=['POST'])
 def register():
     if not request.is_json:
-        return 'missing request data', 400
+        return jsonify(msg='missing request data'), 400
 
     data = request.get_json()
+    if 'user' not in data:
+        return jsonify(msg='missing user in request'), 400
+    if 'pasw' not in data:
+        return jsonify(msg='missing pasw in request'), 400
+
     user = data['user']
+    if store.get(f'hash:{user}'):
+        return jsonify(msg='user already exists'), 403
+
     pasw = data['pasw']
+
     hash = ph.hash(pasw)
 
     store.set(f'hash:{user}', hash)
 
-    return jsonify(token=create_access_token(user)), 200
+    return jsonify(access_token=create_access_token(user)), 200
+
