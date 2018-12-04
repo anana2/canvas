@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request, g
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
 from argon2 import PasswordHasher
 
-from canvasr import store, log
+from canvasr import store
 
 bp = Blueprint('auth', __name__)
 ph = PasswordHasher()

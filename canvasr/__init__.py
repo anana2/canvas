@@ -4,7 +4,7 @@ from flask_redis import FlaskRedis
 from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
 
-store = FlaskRedis()
+store = FlaskRedis(decode_responses=True)
 log = LocalProxy(lambda: current_app.logger)
 jwt = JWTManager()
 collect = Collect()
@@ -41,8 +41,9 @@ def create_app(**kwargs):
         return 'Hello, World!'
 
 
-    from canvasr import auth
+    from canvasr import auth, pixel
     app.register_blueprint(auth.bp)
+    app.register_blueprint(pixel.bp, url_prefix='/pixel')
 
 
     return app
