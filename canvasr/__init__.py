@@ -26,6 +26,7 @@ def create_app(**kwargs):
         from mockredis import MockRedis
         store.provider_class = MockRedis
     store.init_app(app)
+    store.setnx('pixel:id',0)
 
     # jwt manager
     jwt.init_app(app)

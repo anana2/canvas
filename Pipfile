@@ -16,6 +16,7 @@ gunicorn = "*"
 flask-collect = "*"
 flask-redis = "*"
 argon2-cffi = "*"
+hiredis = "*"
 
 [requires]
 python_version = "3.6"
