@@ -10,7 +10,7 @@
 
 ## Quickstart
 
-install the project package with `pipenv install`
+install the project package with `pipenv install --dev`
 
 create a new branch before doing commiting any changes!
 
