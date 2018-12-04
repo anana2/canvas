@@ -17,9 +17,12 @@ flask-collect = "*"
 flask-redis = "*"
 argon2-cffi = "*"
 hiredis = "*"
+flask-socketio = "*"
+eventlet = "*"
+redis = "*"
 
 [requires]
 python_version = "3.6"
 
 [scripts]
-backend = "flask run"
+prod_run = "gunicorn --worker-class eventlet 'canvasr:create_app()'"

@@ -5,12 +5,21 @@ from time import time, asctime
 import logging
 import json
 
-from canvasr import store
+from canvasr import store, socket
 
 log = logging.getLogger('flask.app.pixel')
 log.setLevel(logging.DEBUG)
 
 bp = Blueprint('pixel', __name__)
+
+ch = "canvas:"
+
+@bp.record
+def configuration(setup):
+    global ch
+    ch += setup.app.config['APP_STAGE']
+
+
 
 @bp.route('', methods=['GET','POST'])
 @jwt_required
@@ -30,6 +39,7 @@ def pixel():
             'color' : data['color'],
         }
 
+        socket.emit('post', pixel, namespace='/pixel')
 
         # pixel store
         store.hmset(f"pixel:{pid}", pixel)
@@ -39,11 +49,14 @@ def pixel():
 
         return jsonify(pixel), 200
 
+
     else:
         data = json.loads(request.args.get('f', default='{}'))
 
         if 'coord' in data:
-            pid = store.zrevrange(f"pixel:timestamp:{data['coord']['x']}:{data['coord']['y']}",0,0)[0]
+            pid = store.zrevrange(f"pixel:timestamp:{data['coord']['x']}:{data['coord']['y']}",0,0)
+            if pid:
+                pid = pid[0]
             log.debug(pid)
         else:
             return jsonify(msg='missing pixel identification'), 400

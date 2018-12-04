@@ -3,11 +3,13 @@ from flask_collect import Collect
 from flask_redis import FlaskRedis
 from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
+from flask_socketio import SocketIO
 
 store = FlaskRedis(decode_responses=True)
 log = LocalProxy(lambda: current_app.logger)
 jwt = JWTManager()
 collect = Collect()
+socket = SocketIO()
 
 def create_app(**kwargs):
     app = Flask(__name__)
@@ -30,6 +32,9 @@ def create_app(**kwargs):
 
     # jwt manager
     jwt.init_app(app)
+
+    # socket
+    socket.init_app(app, message_queue=app.config['REDIS_URL'], channel=f"canvas:{app.config['APP_STAGE']}")
 
 
     @app.route('/')
