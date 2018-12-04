@@ -102,7 +102,7 @@ input#Blue::-webkit-slider-thumb{
 }
 #canvas{
 	image-rendering: pixelated;
-	background-color: #eeeeee;
+	background-color: #ffffff;
 	padding: 0;
     margin: auto;
     display: block;

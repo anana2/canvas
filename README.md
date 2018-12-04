@@ -19,7 +19,7 @@ create a new branch before doing commiting any changes!
 setting up your envs:
 
 ```bash
-echo FLASK_APP=canvas_resource >> .env
+echo FLASK_APP=canvasr >> .env
 echo FLASK_ENV=development >> .env
 ```
 
