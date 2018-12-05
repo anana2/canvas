@@ -8,7 +8,7 @@ from flask_socketio import SocketIO, emit
 import eventlet
 eventlet.monkey_patch()
 
-store = FlaskRedis(decode_responses=True)
+store = FlaskRedis()
 log = LocalProxy(lambda: current_app.logger)
 jwt = JWTManager()
 collect = Collect()
@@ -30,7 +30,7 @@ def create_app(**kwargs):
     if app.testing:
         from mockredis import MockRedis
         store.provider_class = MockRedis
-    store.init_app(app)
+    store.init_app(app, decode_responses=True)
     store.setnx('pixel:id',0)
 
     # jwt manager

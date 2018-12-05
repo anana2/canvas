@@ -57,13 +57,13 @@ def pixel():
             pid = store.zrevrange(f"pixel:timestamp:{data['coord']['x']}:{data['coord']['y']}",0,0)
             if pid:
                 pid = pid[0]
-            log.debug(pid)
+            log.debug(f"found pixel with id {pid}")
         else:
             return jsonify(msg='missing pixel identification'), 400
 
         pixel = store.hgetall(f"pixel:{pid}")
 
-        log.debug(pixel)
+        log.debug(f"pixel:{pid}{pixel}")
         if not pixel:
             return jsonify(msg='no pixel found'), 404
 
