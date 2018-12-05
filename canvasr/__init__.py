@@ -3,7 +3,10 @@ from flask_collect import Collect
 from flask_redis import FlaskRedis
 from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
+
+import eventlet
+eventlet.monkey_patch()
 
 store = FlaskRedis(decode_responses=True)
 log = LocalProxy(lambda: current_app.logger)
