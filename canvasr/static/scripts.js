@@ -58,11 +58,45 @@ var mousepos = document.getElementById("colorstring");
 var colortext = document.getElementById("colorstring2");
 
 $(function(){
+	var socket = io();
+	
 	changeColor("#000000");
 	
 	redrawColors(true,c2);
 	
 	var cv2 = cv.getContext("2d");
+	
+	for(var i = 0; i < 100; i++){
+		for(var j = 0; j < 100; j++){
+			var json = {coord: {x: i, y: j}};
+			var lk = 'http://localhost:5000/pixel?f=' + JSON.stringify(json);
+			
+			$.ajax({
+				url: lk,
+				type: 'GET',
+				success: function(response){
+					fill(i,j,response);
+				},
+				error: function(error){
+					console.log(error);
+				},
+			});
+			
+			socket.emit('getcolor', json, function(response){
+				var col = response.color;
+				fill(i,j,col);
+			});
+		}
+	}
+	
+	socket.on('receivecolor', function(json){
+		var xpo = json.coord.x;
+		var ypo = json.coord.y;
+		var col = json.color;
+		
+		fill(xpo,ypo,col);
+	});
+	
 	cv2.fillStyle = "#ffffff";
 	cv2.fillRect(0,0,100,100);
 	
@@ -414,34 +448,33 @@ function writeMessage(canvas){
 	mousepos.innerHTML = message;
 };
 function drawCanvas(canvas){
-	if(color == "sampler" || color != map[mousex][mousey]){
-		if(color == null){
-			changeColor(map[mousex][mousey]);
-		}
-		else{
-			var base = false;
-			var prev = color;
-			for(var i = 0; i < 19; i++){
-				if((i > 9) && !base){
-					var temp = map2[i];
-					if(color == prev && i != 10){
-						break;
-					}
-					else{
-						map2[i] = prev;
-					}
-					prev = temp;
+	if(color == null){
+		changeColor(map[mousex][mousey]);
+	}
+	else if(color != map[mousex][mousey]){
+		var base = false;
+		var prev = color;
+		for(var i = 0; i < 19; i++){
+			if((i > 9) && !base){
+				var temp = map2[i];
+				if(color == prev && i != 10){
+					break;
 				}
-				else if(map2[i] == color){
-					base = true;
+				else{
+					map2[i] = prev;
 				}
+				prev = temp;
 			}
-			if(!base){
-				redrawColors(false,c2);
+			else if(map2[i] == color){
+				base = true;
 			}
-			
-			fill(mousex,mousey,color);
 		}
+		if(!base){
+			redrawColors(false,c2);
+		}
+		
+		draw(mousex,mousey);
+		fill(mousex,mousey,color);
 	}
 };
 function fill(xpos,ypos,c){
@@ -526,3 +559,28 @@ function changeColor(c){
 		bluetext.innerHTML = "B: "+b;
 	}	
 };
+function draw(xcoord,ycoord){
+	var rt = (parseInt(red.value)).toString(2) + "00000";
+	var gt = (parseInt(green.value)).toString(2) + "00";
+	var bt = (parseInt(blue.value)).toString(2);
+	
+	var num = parseInt(rt,2) + parseInt(gt,2) + parseInt(bt,2);
+	var json = {coord: {x: xcoord, y: ycoord}, color: num};
+	var lk = 'http://localhost:5000/pixel?f=' + JSON.stringify(json);
+	
+	$.ajax({
+		url: lk,
+		dataType: 'json',
+		type: 'POST',
+		contentType: "application/json; charset=utf-8",
+		success: function(response){
+			console.log(response);
+		},
+		error: function(error){
+			console.log(error);
+		},
+		data: JSON.stringify(json)
+	});
+	
+	socket.emit('sendcolor', json);
+}
