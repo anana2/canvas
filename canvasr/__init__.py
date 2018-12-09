@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, current_app, g
 from flask_collect import Collect
 from flask_redis import FlaskRedis
@@ -5,8 +8,6 @@ from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO, emit
 
-import eventlet
-eventlet.monkey_patch()
 
 store = FlaskRedis()
 log = LocalProxy(lambda: current_app.logger)
