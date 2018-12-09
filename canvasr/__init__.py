@@ -27,10 +27,7 @@ def create_app(**kwargs):
     collect.init_app(app)
 
     # redis store
-    if app.testing:
-        from mockredis import MockRedis
-        store.provider_class = MockRedis
-    store.init_app(app, decode_responses=True)
+    store.init_app(app)
     store.setnx('pixel:id',0)
 
     # jwt manager
@@ -51,7 +48,7 @@ def create_app(**kwargs):
 
     from canvasr import auth, pixel
     app.register_blueprint(auth.bp)
-    app.register_blueprint(pixel.bp, url_prefix='/pixel')
+    app.register_blueprint(pixel.bp)
 
 
     return app

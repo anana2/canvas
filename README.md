@@ -48,11 +48,13 @@ socket.on('post', function(msg) {
 
 To test protected endpoints you can use a test_user jwt token.
 First you need to set the token secret:
+
 ```bash
 echo JWT_SECRET_KEY=secret >> .env
 ```
+
 Then it is possible to authenticate as the test_user with:
 
-```
+```jwt
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NDM5MDEzNjcsIm5iZiI6MTU0MzkwMTM2NywianRpIjoiMzg2NzE3ODktZTg0Mi00YzE1LWI1NWQtNzgzM2E4YTU3NDU5Iiwic3ViIjoidGVzdF91c2VyIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.WupvIPQS_epmqfOA5Q7Oku4VpLRnp7ax4aEKwhULUdQ
 ```
