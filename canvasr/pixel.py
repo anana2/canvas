@@ -12,12 +12,9 @@ log.setLevel(logging.DEBUG)
 
 bp = Blueprint('pixel', __name__)
 
-ch = "canvas:"
 
-@bp.record
-def configuration(setup):
-    global ch
-    ch += setup.app.config['APP_STAGE']
+XSIZE = 100
+YSIZE = 100
 
 
 
@@ -33,16 +30,24 @@ def draw():
 
     # pixel id
     pid = store.incr('pixel:id')
+    x = data['coord']['x']
+    y = data['coord']['y']
+    color = data['color']
     pixel = {
         'id': pid,
         'timestamp' : int(time()),
         'user' : get_jwt_identity(),
-        'coord' : f"{data['coord']['x']}:{data['coord']['y']}",
-        'color' : data['color'],
+        'coord' : f"{x}:{y}",
+        'color' : color,
     }
 
     # notify all connected clients
     socket.emit('post', pixel, namespace=f"/pixel", broadcast=True)
+
+    # update the board
+    board = store.bitfield('board')
+    board.set('u8', f"#{x+y*XSIZE}", color)
+    board.execute()
 
     #TODO: use mongodb instead of redis for persistence
     # pixel store
@@ -82,15 +87,6 @@ def query():
     return jsonify(pixel), 200
 
 
-
-
-def get_board_data():
-    yield b'This '
-    yield b'is '
-    yield b'the '
-    yield b'board.'
-
-
 @bp.route('/board')
 def get_board():
-    return Response(get_board_data(), 200, mimetype='application/octet-stream')
+    return Response(store.get('board'), 200, mimetype='application/octet-stream')
