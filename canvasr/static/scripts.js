@@ -71,42 +71,36 @@ $(function(){
 	redrawColors(true,c2);
 	
 	if(!test){
-		$.ajax({
-			url: 'http://localhost:5000/board',
-			type: 'GET',
-			success: function(response){
-				for(var i = 0; i < 10000; i++){
-					var stringhex = response.substring((i*4)+2, (i*4)+4);
-					var number = parseInt(stringhex, 16);
-					var c = number.toString(2);
-					while(c.length < 8){
-						c = "0" + c;
-					}
-					var rc = c.substring(0,3);
-					var gc = c.substring(3,6);
-					var bc = c.substring(6,8);
-					
-					var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
-					var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
-					var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
-					
-					if(rhex.length == 1){
-						rhex = "0"+rhex;
-					}
-					if(ghex.length == 1){
-						ghex = "0"+ghex;
-					}
-					if(bhex.length == 1){
-						bhex = "0"+bhex;
-					}
-					
-					var r = "#" + rhex + ghex + bhex;
-					fill(i%100,j/100,response[i]);
+		var lk = 'http://localhost:5000/board';
+		$.getJSON(lk, function(result){
+			var bytestring = window.atob(result.board);
+			for(var i = 0; i < 10000; i++){
+				var number = bytestring.chatCodeAt(i);
+				var c = number.toString(2);
+				while(c.length < 8){
+					c = "0" + c;
 				}
-			},
-			error: function(error){
-				console.log(error);
-			},
+				var rc = c.substring(0,3);
+				var gc = c.substring(3,6);
+				var bc = c.substring(6,8);
+				
+				var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+				var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+				var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+				
+				if(rhex.length == 1){
+					rhex = "0"+rhex;
+				}
+				if(ghex.length == 1){
+					ghex = "0"+ghex;
+				}
+				if(bhex.length == 1){
+					bhex = "0"+bhex;
+				}
+				
+				var r = "#" + rhex + ghex + bhex;
+				fill(i%100,i/100,r);
+			}
 		});
 				
 		/*socket.emit('getcolor', json, function(response){
@@ -115,7 +109,7 @@ $(function(){
 		});*/
 	}
 	else{
-		var str = "/000/016/0f9/03f";
+		/*var str = "/000/016/0f9/03f";
 		var i = 0;
 		var stringhex = str.substring((i*4)+2, (i*4)+4);
 		var number = parseInt(stringhex, 16);
@@ -142,21 +136,45 @@ $(function(){
 		}
 		
 		var r = "#" + rhex + ghex + bhex;
-		fill(50,50,r);
-		/*var cv2 = cv.getContext("2d");
+		fill(50,50,r);*/
+		var cv2 = cv.getContext("2d");
 		cv2.fillStyle = "#ffffff";
-		cv2.fillRect(0,0,100,100);*/
+		cv2.fillRect(0,0,100,100);
 	}
 	
-	/*if(!test){
-		socket.on('receivecolor', function(json){
-			var xpo = json.coord.x;
-			var ypo = json.coord.y;
-			var col = json.color;
+	if(!test){
+		socket.on('receivecolor', function(response){
+			var xpo = response.coord.x;
+			var ypo = response.coord.y;
+			var col = response.color;
 			
-			fill(xpo,ypo,col);
+			var c = col.toString(2);
+			while(c.length < 8){
+				c = "0" + c;
+			}
+			var rc = c.substring(0,3);
+			var gc = c.substring(3,6);
+			var bc = c.substring(6,8);
+			
+			var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+			var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+			var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+			
+			if(rhex.length == 1){
+				rhex = "0"+rhex;
+			}
+			if(ghex.length == 1){
+				ghex = "0"+ghex;
+			}
+			if(bhex.length == 1){
+				bhex = "0"+bhex;
+			}
+			
+			var r = "#" + rhex + ghex + bhex;
+				
+			fill(xpo,ypo,r);
 		});
-	}*/
+	}
 	
 	addEventListener("mousemove",function(event){
 		if(!zooming){
@@ -625,21 +643,23 @@ function draw(xcoord,ycoord){
 	var num = parseInt(rt,2) + parseInt(gt,2) + parseInt(bt,2);
 	var json = {coord: {x: xcoord, y: ycoord}, color: num};
 	var lk = 'http://localhost:5000/pixel?f=' + JSON.stringify(json);
-	var auth = 'Bearer ' + token;
+	var auth = "Bearer " + token;
 	
 	$.ajax({
 		url: lk,
-		Authorization: auth,
-		dataType: 'json',
+		headers: {
+			"Authorization": auth
+		},
+		//dataType: 'json',
 		type: 'POST',
-		contentType: "application/json; charset=utf-8",
+		//contentType: "application/json; charset=utf-8",
 		success: function(response){
 			console.log(response);
 		},
 		error: function(error){
 			console.log(error);
 		},
-		data: JSON.stringify(json)
+		//data: JSON.stringify(json)
 	});
 	
 	/*socket.emit('sendcolor', json);*/
