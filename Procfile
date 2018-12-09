@@ -1,1 +1,1 @@
-web: gunicorn "canvasr:create_app()"
+web: gunicorn --worker-class eventlet "canvasr:create_app()"

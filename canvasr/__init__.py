@@ -1,13 +1,19 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, current_app, g
 from flask_collect import Collect
 from flask_redis import FlaskRedis
 from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
+from flask_socketio import SocketIO, emit
 
-store = FlaskRedis(decode_responses=True)
+
+store = FlaskRedis()
 log = LocalProxy(lambda: current_app.logger)
 jwt = JWTManager()
 collect = Collect()
+socket = SocketIO()
 
 def create_app(**kwargs):
     app = Flask(__name__)
@@ -22,14 +28,14 @@ def create_app(**kwargs):
     collect.init_app(app)
 
     # redis store
-    if app.testing:
-        from mockredis import MockRedis
-        store.provider_class = MockRedis
     store.init_app(app)
     store.setnx('pixel:id',0)
 
     # jwt manager
     jwt.init_app(app)
+
+    # socket
+    socket.init_app(app, message_queue=app.config['REDIS_URL'], channel=f"canvas:{app.config['APP_STAGE']}")
 
 
     @app.route('/')
@@ -43,7 +49,7 @@ def create_app(**kwargs):
 
     from canvasr import auth, pixel
     app.register_blueprint(auth.bp)
-    app.register_blueprint(pixel.bp, url_prefix='/pixel')
+    app.register_blueprint(pixel.bp)
 
 
     return app

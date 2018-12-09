@@ -11,7 +11,7 @@ def init_app(app):
 
 
     app.logger.removeHandler(default_handler) #pylint: disable=E1101
-    logging.getLogger('werkzeug')
+    # logging.getLogger('werkzeug')
 
     dictConfig({
         'version': 1,
@@ -29,6 +29,10 @@ def init_app(app):
         },
         'loggers':{
             'flask.app': {
+                'level': 'INFO',
+                'handlers':['wsgi']
+            },
+            'werkzeug': {
                 'level': 'INFO',
                 'handlers':['wsgi']
             }
