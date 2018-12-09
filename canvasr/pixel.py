@@ -17,7 +17,6 @@ XSIZE = 100
 YSIZE = 100
 
 
-
 @bp.route('/pixel', methods=['POST'])
 @jwt_required
 def draw():
@@ -89,4 +88,4 @@ def query():
 
 @bp.route('/board')
 def get_board():
-    return Response(store.get('board'), 200, mimetype='application/octet-stream')
+    return Response(store.get('board').ljust(XSIZE*YSIZE, b'\x00'), 200, mimetype='application/octet-stream')
