@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from time import time, asctime
 import logging
 import json
+import base64
 
 from canvasr import store, socket
 
@@ -88,4 +89,6 @@ def query():
 
 @bp.route('/board')
 def get_board():
-    return Response(store.get('board').ljust(XSIZE*YSIZE, b'\x00'), 200, mimetype='application/octet-stream')
+    data = store.get('board') or b''
+    data = data.ljust(XSIZE * YSIZE, b'\x00')
+    return Response(data, 200, mimetype='application/octet-stream')
