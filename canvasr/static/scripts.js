@@ -75,8 +75,10 @@ $(function(){
 			url: 'http://localhost:5000/board',
 			type: 'GET',
 			success: function(response){
-				for(var i = 0; i < response.length; i++){
-					var c = response[i].toString(2);
+				for(var i = 0; i < 10000; i++){
+					var stringhex = response.substring((i*3)+1, (i*3)+3);
+					var number = parseInt(stringhex, 16);
+					var c = number.toString(2);
 					while(c.length < 8){
 						c = "0" + c;
 					}
@@ -87,6 +89,16 @@ $(function(){
 					var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 					var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 					var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+					
+					if(rhex.length == 1){
+						rhex = "0"+rhex;
+					}
+					if(ghex.length == 1){
+						ghex = "0"+ghex;
+					}
+					if(bhex.length == 1){
+						bhex = "0"+bhex;
+					}
 					
 					var r = "#" + rhex + ghex + bhex;
 					fill(i%100,j/100,response[i]);
@@ -103,8 +115,11 @@ $(function(){
 		});*/
 	}
 	else{
-		var num = 124;
-		var c = num.toString(2);
+		var str = "/00/16/f9/3f";
+		var i = 0;
+		var stringhex = str.substring((i*3)+1, (i*3)+3);
+		var number = parseInt(stringhex, 16);
+		var c = number.toString(2);
 		while(c.length < 8){
 			c = "0" + c;
 		}
@@ -115,6 +130,16 @@ $(function(){
 		var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 		var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 		var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+		
+		if(rhex.length == 1){
+			rhex = "0"+rhex;
+		}
+		if(ghex.length == 1){
+			ghex = "0"+ghex;
+		}
+		if(bhex.length == 1){
+			bhex = "0"+bhex;
+		}
 		
 		var r = "#" + rhex + ghex + bhex;
 		fill(50,50,r);
