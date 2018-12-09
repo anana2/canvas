@@ -1,5 +1,7 @@
 import os
 
+APP_STAGE='staging'
+
 # flask_redis
 REDIS_URL=os.environ.get('REDIS_URL',default=None)
 

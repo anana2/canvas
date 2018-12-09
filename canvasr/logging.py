@@ -11,13 +11,13 @@ def init_app(app):
 
 
     app.logger.removeHandler(default_handler) #pylint: disable=E1101
-    logging.getLogger('werkzeug')
+    # logging.getLogger('werkzeug')
 
     dictConfig({
         'version': 1,
         'formatters': {
             'default': {
-                'format': f'{Fore.LIGHTBLACK_EX}%(levelname)s %(asctime)s - {Fore.RESET}%(message)s {Fore.LIGHTBLACK_EX} in %(name)s{Fore.RESET}',
+                'format': f'{Fore.LIGHTBLACK_EX}%(levelname)8s {Fore.RESET}%(message)s {Fore.LIGHTBLACK_EX} in %(name)s{Fore.RESET}',
             },
         },
         'handlers': {
@@ -29,19 +29,21 @@ def init_app(app):
         },
         'loggers':{
             'flask.app': {
-                'level': 'INFO',
+                'level': 'DEBUG',
                 'handlers':['wsgi']
             }
         }
     })
 
-    @app.after_request
-    def log_request(response):
-        if request.path == '/favicon.ico':
-            return response
-        elif request.path.startswith('/static'):
-            return response
 
+    @app.before_request
+    def log_request_begin():
+        ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        app.logger.info(f"{Fore.LIGHTBLACK_EX}{ip} {Fore.LIGHTWHITE_EX}> {request.method} {Fore.WHITE}{request.path}")
+
+
+    @app.after_request
+    def log_request_end(response):
         ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         #host = request.host.split(':', 1)[0]
         #args = dict(request.args)
@@ -54,12 +56,7 @@ def init_app(app):
         elif status >= 200:
             status_color = Fore.GREEN
 
-        app.logger.info("{ip} > {code} {meth:6} {path}".format( #pylint: disable=E1101
-            ip=Fore.LIGHTBLACK_EX+ip,
-            code=status_color+str(status),
-            meth=Fore.LIGHTWHITE_EX+request.method,
-            path=Fore.WHITE+request.path,
-        ))
+        app.logger.info(f"{Fore.LIGHTBLACK_EX}{ip} {Fore.LIGHTWHITE_EX}< {status_color}{response.status_code}")
 
         return response
 
