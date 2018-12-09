@@ -8,7 +8,6 @@ import json
 from canvasr import store, socket
 
 log = logging.getLogger('flask.app.pixel')
-log.setLevel(logging.DEBUG)
 
 bp = Blueprint('pixel', __name__)
 
@@ -42,6 +41,7 @@ def draw():
 
     # notify all connected clients
     socket.emit('post', pixel, namespace=f"/pixel", broadcast=True)
+    log.debug(f"drawn pixel:{pid}{pixel}")
 
     # update the board
     board = store.bitfield('board')
