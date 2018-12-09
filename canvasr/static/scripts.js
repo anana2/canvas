@@ -59,7 +59,7 @@ var colortext = document.getElementById("colorstring2");
 
 var socket = null;
 var token = null;
-var test = true;
+var test = false;
 
 if(!test){
 	socket = io();
