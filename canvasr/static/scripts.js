@@ -76,7 +76,7 @@ $(function(){
 			type: 'GET',
 			success: function(response){
 				for(var i = 0; i < 10000; i++){
-					var stringhex = response.substring((i*3)+1, (i*3)+3);
+					var stringhex = response.substring((i*4)+2, (i*4)+4);
 					var number = parseInt(stringhex, 16);
 					var c = number.toString(2);
 					while(c.length < 8){
@@ -115,9 +115,9 @@ $(function(){
 		});*/
 	}
 	else{
-		var str = "/00/16/f9/3f";
+		var str = "/000/016/0f9/03f";
 		var i = 0;
-		var stringhex = str.substring((i*3)+1, (i*3)+3);
+		var stringhex = str.substring((i*4)+2, (i*4)+4);
 		var number = parseInt(stringhex, 16);
 		var c = number.toString(2);
 		while(c.length < 8){
