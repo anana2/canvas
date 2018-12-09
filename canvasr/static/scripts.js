@@ -57,48 +57,81 @@ var bluetext = document.getElementById("bluetext");
 var mousepos = document.getElementById("colorstring");
 var colortext = document.getElementById("colorstring2");
 
+var socket = null;
+var token = null;
+var test = true;
+
+if(!test){
+	socket = io();
+}
+
 $(function(){
-	var socket = io();
-	
 	changeColor("#000000");
 	
 	redrawColors(true,c2);
 	
-	var cv2 = cv.getContext("2d");
-	
-	for(var i = 0; i < 100; i++){
-		for(var j = 0; j < 100; j++){
-			var json = {coord: {x: i, y: j}};
-			var lk = 'http://localhost:5000/pixel?f=' + JSON.stringify(json);
-			
-			$.ajax({
-				url: lk,
-				type: 'GET',
-				success: function(response){
-					fill(i,j,response);
-				},
-				error: function(error){
-					console.log(error);
-				},
-			});
-			
-			socket.emit('getcolor', json, function(response){
-				var col = response.color;
-				fill(i,j,col);
-			});
+	if(!test){
+		$.ajax({
+			url: 'http://localhost:5000/board',
+			type: 'GET',
+			success: function(response){
+				for(var i = 0; i < response.length; i++){
+					var c = response[i].toString(2);
+					while(c.length < 8){
+						c = "0" + c;
+					}
+					var rc = c.substring(0,3);
+					var gc = c.substring(3,6);
+					var bc = c.substring(6,8);
+					
+					var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+					var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+					var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+					
+					var r = "#" + rhex + ghex + bhex;
+					fill(i%100,j/100,response[i]);
+				}
+			},
+			error: function(error){
+				console.log(error);
+			},
+		});
+				
+		/*socket.emit('getcolor', json, function(response){
+			var col = response.color;
+			fill(i,j,col);
+		});*/
+	}
+	else{
+		var num = 124;
+		var c = num.toString(2);
+		while(c.length < 8){
+			c = "0" + c;
 		}
+		var rc = c.substring(0,3);
+		var gc = c.substring(3,6);
+		var bc = c.substring(6,8);
+		
+		var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+		var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+		var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+		
+		var r = "#" + rhex + ghex + bhex;
+		fill(50,50,r);
+		/*var cv2 = cv.getContext("2d");
+		cv2.fillStyle = "#ffffff";
+		cv2.fillRect(0,0,100,100);*/
 	}
 	
-	socket.on('receivecolor', function(json){
-		var xpo = json.coord.x;
-		var ypo = json.coord.y;
-		var col = json.color;
-		
-		fill(xpo,ypo,col);
-	});
-	
-	cv2.fillStyle = "#ffffff";
-	cv2.fillRect(0,0,100,100);
+	/*if(!test){
+		socket.on('receivecolor', function(json){
+			var xpo = json.coord.x;
+			var ypo = json.coord.y;
+			var col = json.color;
+			
+			fill(xpo,ypo,col);
+		});
+	}*/
 	
 	addEventListener("mousemove",function(event){
 		if(!zooming){
@@ -567,9 +600,11 @@ function draw(xcoord,ycoord){
 	var num = parseInt(rt,2) + parseInt(gt,2) + parseInt(bt,2);
 	var json = {coord: {x: xcoord, y: ycoord}, color: num};
 	var lk = 'http://localhost:5000/pixel?f=' + JSON.stringify(json);
+	var auth = 'Bearer ' + token;
 	
 	$.ajax({
 		url: lk,
+		Authorization: auth,
 		dataType: 'json',
 		type: 'POST',
 		contentType: "application/json; charset=utf-8",
@@ -582,5 +617,5 @@ function draw(xcoord,ycoord){
 		data: JSON.stringify(json)
 	});
 	
-	socket.emit('sendcolor', json);
+	/*socket.emit('sendcolor', json);*/
 }
