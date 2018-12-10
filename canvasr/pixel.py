@@ -27,6 +27,18 @@ def configuration(state):
     YSIZE = state.app.config['BOARD_YSIZE']
     CDTIME = state.app.config['CD_TIME']
 
+    data = store.get('board')
+    if not data or len(data) < XSIZE*YSIZE:
+        # temp TODO: update this
+        board = store.bitfield('board')
+        for x in range(XSIZE):
+            for y in range(YSIZE):
+                pixel = store.zrevrange(f"pixel:timestamp:{x}:{y}",0,0)
+                color = store.hget(f"pixel:{pixel}",'color') or 0xff
+                board.set('u8', f"#{x+y*XSIZE}", color)
+        board.execute()
+
+
 @bp.route('/pixel', methods=['POST'])
 @jwt_required
 def draw():
@@ -49,12 +61,14 @@ def draw():
     pid = store.incr('pixel:id')
     x = data['coord']['x']
     y = data['coord']['y']
+    timestamp = int(time())
     color = data['color']
+
     pixel = {
         'id': pid,
-        'timestamp' : int(time()),
+        'timestamp' : timestamp,
         'user' : user,
-        'coord' : f"{x}:{y}",
+        'coord' : data['coord'],
         'color' : color,
     }
 
@@ -68,10 +82,18 @@ def draw():
     board.execute()
 
     #TODO: use mongodb instead of redis for persistence
+    # flattened pixel object
+    _pixel = {
+        'id': pid,
+        'timestamp' : timestamp,
+        'user': user,
+        'coord': f"{x}:{y}",
+        'color': color,
+    }
     # pixel store
-    store.hmset(f"pixel:{pid}", pixel)
+    store.hmset(f"pixel:{pid}", _pixel)
     # pixel indeces
-    store.zadd(f"pixel:timestamp:{pixel['coord']}", {pid:pixel['timestamp']})
+    store.zadd(f"pixel:timestamp:{x}:{y}", {pid:timestamp})
 
     return jsonify(pixel), 200
 

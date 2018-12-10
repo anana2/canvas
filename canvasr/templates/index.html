@@ -2,13 +2,117 @@
 <html>
 <head>
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-<link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-114/svg-assets-cache.js"></script>
+<script src="https://cdn.gitcdn.link/cdn/angular/bower-material/v1.1.0-rc.5/angular-material.js"></script>
+<script src="{{ url_for('static',filename='scripts.js') }}"></script>
+<script src="{{ url_for('static',filename='scriptsAng.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+<link rel="stylesheet" href="https://cdn.gitcdn.link/cdn/angular/bower-material/v1.1.0-rc.5/angular-material.css">
+<link rel="stylesheet" href="https://material.angularjs.org/1.1.0-rc.5/docs.css">
 </head>
 <body>
 <div id="top" height="10%">
 <button id="zoom" onclick="ZoomIn()">zoom+</button>
 <button id="zoom2" onclick="ZoomOut()">zoom-</button>
+<!-- TEST BUTTONS -->
+<!-- <button id="login" onclick="Login('test', 'password')">Login-</button> -->
+<div ng-app="app" ng-controller="AppController as login" class="md-padding dialogdemoBasicUsage" id="popupContainer" ng-cloak>
+  <div class="dialog-demo-content" layout="row" layout-wrap layout-margin layout-align="center">
+    <md-button class="md-primary md-raised" ng-click="login.showDialog($event)">
+      Login
+    </md-button>
+    <md-button class="md-primary md-raised" ng-click="register.showDialog($event)">
+      Register
+    </md-button>
+  </div>
+  <div hide-gt-sm layout="row" layout-align="center center" flex>
+    <md-checkbox ng-model="login.customFullscreen" aria-label="Fullscreen Custom Dialog">Force Custom Dialog Fullscreen</md-checkbox>
+  </div>
+
+  <div ng-if="login.status" id="status">
+    <b layout="row" layout-align="center center" class="md-padding">
+      {a login.status a}
+    </b>
+  </div>
+
+  <script type="text/ng-template" id="login-dialog.template.html">
+    <md-dialog id="login-dialog" aria-label="Login" ng-cloak>
+      <form name="loginForm" ng-submit="dialog.login()">
+        <md-toolbar>
+          <div class="md-toolbar-tools">
+            <h2>Log In</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="dialog.close()">
+              <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+          <div class="md-dialog-content">
+            <md-input-container class="md-block">
+              <label>Username</label>
+              <input name="username" ng-model="dialog.username" md-autofocus required />
+            </md-input-container>
+            <md-input-container class="md-block">
+              <label>Password</label>
+              <input type="password" name="password" ng-model="dialog.password" required />
+            </md-input-container>
+          </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+          <span flex></span>
+          <md-button type="submit" ng-disabled="loginForm.$invalid" class="md-raised md-primary">Login</md-button>
+        </md-dialog-actions>
+      </form>
+    </md-dialog>
+  </script>
+  
+  <script type="text/ng-template" id="register-dialog.template.html">
+    <md-dialog id="register-dialog" aria-label="Register" ng-cloak>
+      <form name="registerForm" ng-submit="dialog.register()">
+        <md-toolbar>
+          <div class="md-toolbar-tools">
+            <h2>Register</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="dialog.close()">
+              <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+          <div class="md-dialog-content">
+            <md-input-container class="md-block">
+              <label>Username</label>
+              <input name="username" ng-model="dialog.username" md-autofocus required />
+            </md-input-container>
+            <md-input-container class="md-block">
+              <label>Password</label>
+              <input type="password" name="password" ng-model="dialog.password" required />
+            </md-input-container>
+          </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+          <span flex></span>
+          <md-button type="submit" ng-disabled="registerForm.$invalid" class="md-raised md-primary">Register</md-button>
+        </md-dialog-actions>
+      </form>
+    </md-dialog>
+  </script>
+</div>
+
+<!-- <button id="register" onclick="Register('test', 'password')">Register-</button> -->
+<!-- END TEST BUTTONS -->
 <span class="info" id="zoomlevel">Zoom: 1x </span>
 </div>
 <div id="mid">
@@ -24,15 +128,15 @@ Your browser does not support the HTML5 canvas tag.
 <div id="bottomleft">
 <div class="leftrange">
 <input type="range" min="0" max="7" value="0" class="slider" id="Red">
-<span id="redtext">R: 0</span>
+<span id="redtext">Red: 0</span>
 </div>
 <div class="leftrange">
 <input type="range" min="0" max="7" value="0" class="slider" id="Green">
-<span id="greentext">G: 0</span>
+<span id="greentext">Green: 0</span>
 </div>
 <div class="leftrange">
 <input type="range" min="0" max="3" value="0" class="slider" id="Blue">
-<span id="bluetext">B: 0</span>
+<span id="bluetext">Blue: 0</span>
 </div>
 </div>
 <div id="bottommid">
@@ -60,5 +164,4 @@ Your browser does not support the HTML5 canvas tag.
 </div>
 </div>
 </body>
-<script src="{{url_for('static',filename='scripts.js')}}"></script>
 </html>

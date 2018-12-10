@@ -127,3 +127,11 @@ input#Blue::-webkit-slider-thumb{
 #colorstring2{
 	float: left;
 }
+.dialogdemoBasicUsage #popupContainer {
+  position: relative;
+}
+
+#login-dialog {
+  max-width: 90%;
+  width: 500px;
+}
