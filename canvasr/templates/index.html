@@ -25,10 +25,10 @@
 <!-- <button id="login" onclick="Login('test', 'password')">Login-</button> -->
 <div ng-app="app" ng-controller="AppController as login" class="md-padding dialogdemoBasicUsage" id="popupContainer" ng-cloak>
   <div class="dialog-demo-content" layout="row" layout-wrap layout-margin layout-align="center">
-    <md-button class="md-primary md-raised" ng-click="login.showDialog($event)">
+    <md-button class="md-primary md-raised" ng-click="login.showLoginDialog($event)">
       Login
     </md-button>
-    <md-button class="md-primary md-raised" ng-click="register.showDialog($event)">
+    <md-button class="md-primary md-raised" ng-click="login.showRegisterDialog($event)">
       Register
     </md-button>
   </div>
@@ -78,12 +78,12 @@
   
   <script type="text/ng-template" id="register-dialog.template.html">
     <md-dialog id="register-dialog" aria-label="Register" ng-cloak>
-      <form name="registerForm" ng-submit="dialog.register()">
+      <form name="registerForm" ng-submit="registerDialog.register()">
         <md-toolbar>
           <div class="md-toolbar-tools">
             <h2>Register</h2>
             <span flex></span>
-            <md-button class="md-icon-button" ng-click="dialog.close()">
+            <md-button class="md-icon-button" ng-click="registerDialog.close()">
               <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
             </md-button>
           </div>
@@ -93,11 +93,11 @@
           <div class="md-dialog-content">
             <md-input-container class="md-block">
               <label>Username</label>
-              <input name="username" ng-model="dialog.username" md-autofocus required />
+              <input name="username" ng-model="registerDialog.username" md-autofocus required />
             </md-input-container>
             <md-input-container class="md-block">
               <label>Password</label>
-              <input type="password" name="password" ng-model="dialog.password" required />
+              <input type="password" name="password" ng-model="registerDialog.password" required />
             </md-input-container>
           </div>
         </md-dialog-content>

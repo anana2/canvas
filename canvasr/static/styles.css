@@ -135,3 +135,8 @@ input#Blue::-webkit-slider-thumb{
   max-width: 90%;
   width: 500px;
 }
+
+#register-dialog {
+  max-width: 90%;
+  width: 500px;
+}
