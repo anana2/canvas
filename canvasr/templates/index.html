@@ -1,13 +1,19 @@
 <!doctype html>
 <html>
 <head>
-<link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+<script src="{{ url_for('static',filename='scripts.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
 </head>
 <body>
 <div id="top" height="10%">
 <button id="zoom" onclick="ZoomIn()">zoom+</button>
 <button id="zoom2" onclick="ZoomOut()">zoom-</button>
+<!-- TEST BUTTONS -->
+<button id="login" onclick="Login('test', 'password')">Login-</button>
+<button id="register" onclick="Register('test', 'password')">Register-</button>
+<!-- END TEST BUTTONS -->
 <span class="info" id="zoomlevel">Zoom: 1x </span>
 </div>
 <div id="mid">
@@ -23,15 +29,15 @@ Your browser does not support the HTML5 canvas tag.
 <div id="bottomleft">
 <div class="leftrange">
 <input type="range" min="0" max="7" value="0" class="slider" id="Red">
-<span id="redtext">R: 0</span>
+<span id="redtext">Red: 0</span>
 </div>
 <div class="leftrange">
 <input type="range" min="0" max="7" value="0" class="slider" id="Green">
-<span id="greentext">G: 0</span>
+<span id="greentext">Green: 0</span>
 </div>
 <div class="leftrange">
 <input type="range" min="0" max="3" value="0" class="slider" id="Blue">
-<span id="bluetext">B: 0</span>
+<span id="bluetext">Blue: 0</span>
 </div>
 </div>
 <div id="bottommid">
@@ -59,5 +65,4 @@ Your browser does not support the HTML5 canvas tag.
 </div>
 </div>
 </body>
-<script src="{{url_for('static',filename='scripts.js')}}"></script>
 </html>

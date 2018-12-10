@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, Response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from time import time, asctime
+from base64 import b64encode
 import logging
 import json
 
@@ -12,8 +13,30 @@ log = logging.getLogger('flask.app.pixel')
 bp = Blueprint('pixel', __name__)
 
 
-XSIZE = 100
-YSIZE = 100
+XSIZE = 0
+YSIZE = 0
+CDTIME = 0
+
+
+@bp.record
+def configuration(state):
+    global XSIZE
+    global YSIZE
+    global CDTIME
+    XSIZE = state.app.config['BOARD_XSIZE']
+    YSIZE = state.app.config['BOARD_YSIZE']
+    CDTIME = state.app.config['CD_TIME']
+
+    data = store.get('board')
+    if not data or len(data) < XSIZE*YSIZE:
+        # temp TODO: update this
+        board = store.bitfield('board')
+        for x in range(XSIZE):
+            for y in range(YSIZE):
+                pixel = store.zrevrange(f"pixel:timestamp:{x}:{y}",0,0)
+                color = store.hget(f"pixel:{pixel}",'color') or 0xff
+                board.set('u8', f"#{x+y*XSIZE}", color)
+        board.execute()
 
 
 @bp.route('/pixel', methods=['POST'])
@@ -26,16 +49,26 @@ def draw():
     if 'x' not in data['coord'] or 'y' not in data['coord']:
         return 'wrong coordinates format', 400
 
+    user = get_jwt_identity()
+
+    # check cooldown
+    if store.get(f"lock:{user}") is not None:
+        return 'in cooldown, draw not available', 403
+
+    store.setex(f"lock:{user}",CDTIME,'_')
+
     # pixel id
     pid = store.incr('pixel:id')
     x = data['coord']['x']
     y = data['coord']['y']
+    timestamp = int(time())
     color = data['color']
+
     pixel = {
         'id': pid,
-        'timestamp' : int(time()),
-        'user' : get_jwt_identity(),
-        'coord' : f"{x}:{y}",
+        'timestamp' : timestamp,
+        'user' : user,
+        'coord' : data['coord'],
         'color' : color,
     }
 
@@ -49,10 +82,18 @@ def draw():
     board.execute()
 
     #TODO: use mongodb instead of redis for persistence
+    # flattened pixel object
+    _pixel = {
+        'id': pid,
+        'timestamp' : timestamp,
+        'user': user,
+        'coord': f"{x}:{y}",
+        'color': color,
+    }
     # pixel store
-    store.hmset(f"pixel:{pid}", pixel)
+    store.hmset(f"pixel:{pid}", _pixel)
     # pixel indeces
-    store.zadd(f"pixel:timestamp:{pixel['coord']}", {pid:pixel['timestamp']})
+    store.zadd(f"pixel:timestamp:{x}:{y}", {pid:timestamp})
 
     return jsonify(pixel), 200
 
@@ -88,4 +129,6 @@ def query():
 
 @bp.route('/board')
 def get_board():
-    return Response(store.get('board').ljust(XSIZE*YSIZE, b'\x00'), 200, mimetype='application/octet-stream')
+    data = store.get('board') or b''
+    data = data.ljust(XSIZE * YSIZE, b'\xff')
+    return Response(b64encode(data), 200, mimetype='application/x-rgb8')
