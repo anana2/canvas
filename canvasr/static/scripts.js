@@ -68,7 +68,7 @@ var username = null;
 
 function Login(username, password){
 	var json = {user: username, pasw: password};
-	var path = baseUrl + '/login';
+	var path = baseUrl + 'login';
 	$.ajax({
 		url: path,
 		data: JSON.stringify(json),
@@ -102,7 +102,7 @@ function Login(username, password){
 
 function Register(username, password){
 	var json = {user: username, pasw: password};
-	var path = baseUrl + '/register';
+	var path = baseUrl + 'register';
 	$.ajax({
 		url: path,
 		data: JSON.stringify(json),
@@ -179,7 +179,7 @@ function drawPixel(coord, color) {
 // get board on start
 
 $(function() {
-	var path = baseUrl + '/board';
+	var path = baseUrl + 'board';
 	$.ajax(path, {
 		accepts: {
 			xrgb8: 'application/x-rgb8'
@@ -726,7 +726,7 @@ function draw(xcoord,ycoord){
 	
 	var num = parseInt(rt,2) + parseInt(gt,2) + parseInt(bt,2);
 	var json = {coord: {x: xcoord, y: ycoord}, color: num};
-	var lk = baseUrl + '/pixel';
+	var lk = baseUrl + 'pixel';
 	//TODO: check for valid token
 	var auth = "Bearer " + token;
 
