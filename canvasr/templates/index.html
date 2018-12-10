@@ -13,6 +13,8 @@
 <script src="{{ url_for('static',filename='scripts.js') }}"></script>
 <script src="{{ url_for('static',filename='scriptsAng.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+<link rel="stylesheet" href="https://cdn.gitcdn.link/cdn/angular/bower-material/v1.1.0-rc.5/angular-material.css">
+<link rel="stylesheet" href="https://material.angularjs.org/1.1.0-rc.5/docs.css">
 </head>
 <body>
 <div id="top" height="10%">
@@ -35,7 +37,7 @@
 
   <div ng-if="login.status" id="status">
     <b layout="row" layout-align="center center" class="md-padding">
-      {{login.status}}
+      {a login.status a}
     </b>
   </div>
 
@@ -109,7 +111,7 @@
 </div>
 
 <!-- <button id="register" onclick="Register('test', 'password')">Register-</button> -->
- --><!-- END TEST BUTTONS
+<!-- END TEST BUTTONS -->
 <span class="info" id="zoomlevel">Zoom: 1x </span>
 </div>
 <div id="mid">
