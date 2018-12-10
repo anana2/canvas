@@ -60,6 +60,91 @@ var colortext = document.getElementById("colorstring2");
 var socket = null;
 var token = null;
 var test = false;
+var loggedIn = false;
+var errMsg = null;
+var username = null;
+
+function Login(username, password){
+
+	var json = {user: username, passw: password};
+	var path = 'http://localhost:5000/login';
+	
+	$.ajax({
+		url: path,
+		data: JSON.stringify(json),
+		dataType: 'json',
+		type: 'POST',
+		success: function(response){
+			console.log(response);
+			if (response.status == 200){
+				// token = response.['access_token'];
+				// token = response.access_token;
+				AuthOver(username, response['access_token']);
+			}
+			else if(response.status == 401){
+				console.log(response['msg']);
+				errMsg = "Incorrect password";
+			}
+			else if(response.status == 404){
+				console.log(response['msg']);
+				errMsg = "Incorrect username";
+			}
+			else {
+				console.log(response['msg']);
+			}
+		},
+		error: function(error){
+			console.log(error);
+		},
+	});
+
+}
+
+function Register(username, password){
+
+	var json = {user: username, passw: password};
+	var path = 'http://localhost:5000/register';
+	
+	$.ajax({
+		url: path,
+		data: JSON.stringify(json),
+		dataType: 'json',
+		type: 'POST',
+		success: function(response){
+			console.log(response);
+			if (response.status == 200){
+				// token = response.['access_token'];
+				// token = response.access_token;
+				AuthOver(username, response['access_token']);
+			}
+			else if(response.status == 403){
+				console.log(response['msg']);
+				errMsg = "Username already taken";
+			}
+			else {
+				console.log(response['msg']);
+			}
+		},
+		error: function(error){
+			console.log(error);
+		},
+	});
+
+}
+
+function ResetAuth(){
+	//	TODO: angular_js reset authentication box (intial tab: login tab)
+	username = null;
+	token = null;
+	loggedIn = false;
+}
+
+function AuthOver(usernameSet, tokenSet){
+	username = usernameSet;
+	token = tokenSet;
+	loggedIn = true;
+	//	TODO: angular_js slide authentication box out of center
+}
 
 if(!test){
 	socket = io();
