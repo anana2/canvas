@@ -7,6 +7,7 @@ from flask_redis import FlaskRedis
 from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 
 
 store = FlaskRedis()
@@ -19,6 +20,9 @@ def create_app(**kwargs):
     app = Flask(__name__)
     app.config.from_pyfile('config.py')
     app.config.update(**kwargs)
+
+    # cors
+    cors = CORS(app)
 
     # custom loggin
     from canvasr import logging
