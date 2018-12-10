@@ -279,7 +279,7 @@ $(function(){
 	redrawColors(true,c2);
 
 
-	$('#canvas').mousemove(function(event){
+	addEventListener('mousemove',function(event){
 		if(!zooming){
 			writeMessage(cv);
 		}
