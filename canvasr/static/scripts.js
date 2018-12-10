@@ -157,7 +157,17 @@ $(function(){
 	
 	if(!test){
 		var lk = 'http://localhost:5000/board';
-		$.getJSON(lk, function(result){
+		$.ajax(lk, {
+			accepts: {
+				xrgb8: 'application/x-rgb8'
+			},
+			converters: {
+				'xrgb8': d => d
+			},
+			type: 'GET',
+			success: function(data){
+				console.log(data)
+			/*
 			var bytestring = window.atob(result.board);
 			for(var i = 0; i < 10000; i++){
 				var number = bytestring.chatCodeAt(i);
@@ -168,7 +178,7 @@ $(function(){
 				var rc = c.substring(0,3);
 				var gc = c.substring(3,6);
 				var bc = c.substring(6,8);
-				
+
 				var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 				var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 				var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
@@ -185,6 +195,8 @@ $(function(){
 				
 				var r = "#" + rhex + ghex + bhex;
 				fill(i%100,i/100,r);
+			}
+			*/
 			}
 		});
 				
