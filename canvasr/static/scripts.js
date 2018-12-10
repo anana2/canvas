@@ -71,7 +71,7 @@ function Login(username, password){
 	
 	$.ajax({
 		url: path,
-		data: JSON.stringify(json)
+		data: JSON.stringify(json),
 		dataType: 'json',
 		type: 'POST',
 		success: function(response){
@@ -79,7 +79,7 @@ function Login(username, password){
 			if (response.status == 200){
 				// token = response.['access_token'];
 				// token = response.access_token;
-				AuthOver(username, response.['access_token']);
+				AuthOver(username, response['access_token']);
 			}
 			else if(response.status == 401){
 				console.log(response['msg']);
@@ -107,7 +107,7 @@ function Register(username, password){
 	
 	$.ajax({
 		url: path,
-		data: JSON.stringify(json)
+		data: JSON.stringify(json),
 		dataType: 'json',
 		type: 'POST',
 		success: function(response){
@@ -115,7 +115,7 @@ function Register(username, password){
 			if (response.status == 200){
 				// token = response.['access_token'];
 				// token = response.access_token;
-				AuthOver(username, response.['access_token']);
+				AuthOver(username, response['access_token']);
 			}
 			else if(response.status == 403){
 				console.log(response['msg']);
