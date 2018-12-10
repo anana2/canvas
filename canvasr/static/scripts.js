@@ -150,10 +150,10 @@ if(!test){
 
 
 // 8-bit pallete
-var pallete = {
-    red: [0,32,64,96,128,160,196,224],
-    green: [0,32,64,96,128,160,196,224],
-    blue: [0,64,128,192]
+var palette = {
+    red: [0,36,72,109,145,182,218,255],
+    green: [0,36,72,109,145,182,218,255],
+    blue: [0,85,170,255]
 }
 
 function drawBoard() {
@@ -171,9 +171,9 @@ function drawBoard() {
 				for (var i = 0; i < l; i++) {
 					d = data.charCodeAt(i)
 					j = i*4
-					view[j] = pallete.red[(d & 0b11100000) >> 5];
-					view[++j] = pallete.green[(d & 0b00011100) >> 2];
-					view[++j] = pallete.blue[(d & 0b00000011)];
+					view[j] = palette.red[(d & 0b11100000) >> 5];
+					view[++j] = palette.green[(d & 0b00011100) >> 2];
+					view[++j] = palette.blue[(d & 0b00000011)];
 					view[++j] = 255;
 				}
 				return view
