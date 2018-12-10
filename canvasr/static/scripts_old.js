@@ -1,5 +1,3 @@
-var baseUrl = document.baseURI
-
 var map = [];
 for(var i = 0; i < 100; i++){
 	map[i] = [];
@@ -67,20 +65,22 @@ var errMsg = null;
 var username = null;
 
 function Login(username, password){
-	var json = {user: username, pasw: password};
-	var path = baseUrl + '/login';
+
+	var json = {user: username, passw: password};
+	var path = 'http://localhost:5000/login';
+	
 	$.ajax({
 		url: path,
 		data: JSON.stringify(json),
-		contentType: 'application/json; charset=utf-8',
 		dataType: 'json',
 		type: 'POST',
 		success: function(response){
-			// console.log(response);
-			// token = response.['access_token'];
-			// token = response.access_token;
-			AuthOver(username, response['access_token']);
-			/*
+			console.log(response);
+			if (response.status == 200){
+				// token = response.['access_token'];
+				// token = response.access_token;
+				AuthOver(username, response['access_token']);
+			}
 			else if(response.status == 401){
 				console.log(response['msg']);
 				errMsg = "Incorrect password";
@@ -92,21 +92,22 @@ function Login(username, password){
 			else {
 				console.log(response['msg']);
 			}
-			*/
 		},
 		error: function(error){
 			console.log(error);
 		},
 	});
+
 }
 
 function Register(username, password){
-	var json = {user: username, pasw: password};
-	var path = baseUrl + '/register';
+
+	var json = {user: username, passw: password};
+	var path = 'http://localhost:5000/register';
+	
 	$.ajax({
 		url: path,
 		data: JSON.stringify(json),
-		contentType: 'application/json; charset=utf-8',
 		dataType: 'json',
 		type: 'POST',
 		success: function(response){
@@ -128,6 +129,7 @@ function Register(username, password){
 			console.log(error);
 		},
 	});
+
 }
 
 function ResetAuth(){
@@ -148,76 +150,95 @@ if(!test){
 	socket = io();
 }
 
-
-// 8-bit pallete
-var pallete = {
-    red: [0,32,64,96,128,160,196,224],
-    green: [0,32,64,96,128,160,196,224],
-    blue: [0,64,128,192]
-}
-
-function drawBoard() {
-	var path = baseUrl + '/board';
-	$.ajax(path, {
-		accepts: {
-			xrgb8: 'application/x-rgb8'
-		},
-		converters: {
-			'text xrgb8': function(data) {
-				data = atob(data);
-				l = data.length;
-				var buf = new ArrayBuffer(l*4);
-				var view = new Uint8ClampedArray(buf)
-				for (var i = 0; i < l; i++) {
-					d = data.charCodeAt(i)
-					j = i*4
-					view[j] = pallete.red[(d & 0b11100000) >> 5];
-					view[++j] = pallete.green[(d & 0b00011100) >> 2];
-					view[++j] = pallete.blue[(d & 0b00000011)];
-					view[++j] = 255;
-				}
-				return view
-			}
-		},
-		type: 'GET',
-		dataType: 'xrgb8',
-		success: function(data, status, xhr){
-			const ctx = $('#canvas')[0].getContext('2d');
-			const image = ctx.createImageData(ctx.canvas.width,ctx.canvas.height);
-			image.data.set(data);
-			ctx.putImageData(image,0,0);
-		}
-	});
-}
-
 $(function(){
+	changeColor("#000000");
+	
+	redrawColors(true,c2);
+	
+	if(!test){
+		var lk = 'http://localhost:5000/board';
+		$.ajax(lk, {
+			accepts: {
+				xrgb8: 'application/x-rgb8'
+			},
+			converters: {
+				'xrgb8': d => d
+			},
+			type: 'GET',
+			success: function(data){
+				console.log(data)
+			/*
+			var bytestring = window.atob(result.board);
+			for(var i = 0; i < 10000; i++){
+				var number = bytestring.chatCodeAt(i);
+				var c = number.toString(2);
+				while(c.length < 8){
+					c = "0" + c;
+				}
+				var rc = c.substring(0,3);
+				var gc = c.substring(3,6);
+				var bc = c.substring(6,8);
 
-	//TODO:
-	cv = document.getElementById("canvas");
-	mid = document.getElementById("mid");
-	pos = document.getElementById("midpos");
-	sca = document.getElementById("midscale");
-	zoomlevel = document.getElementById("zoomlevel");
-	c1 = document.getElementById("color1");
-	c2 = document.getElementById("color2");
-
-	red = document.getElementById("Red");
-	green = document.getElementById("Green");
-	blue = document.getElementById("Blue");
-	redtext = document.getElementById("redtext");
-	greentext = document.getElementById("greentext");
-	bluetext = document.getElementById("bluetext");
-
-	mousepos = document.getElementById("colorstring");
-	colortext = document.getElementById("colorstring2");
-
-
-
-	//changeColor("#000000");
-
-	//redrawColors(true,c2);
-
-
+				var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+				var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+				var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+				
+				if(rhex.length == 1){
+					rhex = "0"+rhex;
+				}
+				if(ghex.length == 1){
+					ghex = "0"+ghex;
+				}
+				if(bhex.length == 1){
+					bhex = "0"+bhex;
+				}
+				
+				var r = "#" + rhex + ghex + bhex;
+				fill(i%100,i/100,r);
+			}
+			*/
+			}
+		});
+				
+		/*socket.emit('getcolor', json, function(response){
+			var col = response.color;
+			fill(i,j,col);
+		});*/
+	}
+	else{
+		/*var str = "/000/016/0f9/03f";
+		var i = 0;
+		var stringhex = str.substring((i*4)+2, (i*4)+4);
+		var number = parseInt(stringhex, 16);
+		var c = number.toString(2);
+		while(c.length < 8){
+			c = "0" + c;
+		}
+		var rc = c.substring(0,3);
+		var gc = c.substring(3,6);
+		var bc = c.substring(6,8);
+		
+		var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+		var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
+		var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
+		
+		if(rhex.length == 1){
+			rhex = "0"+rhex;
+		}
+		if(ghex.length == 1){
+			ghex = "0"+ghex;
+		}
+		if(bhex.length == 1){
+			bhex = "0"+bhex;
+		}
+		
+		var r = "#" + rhex + ghex + bhex;
+		fill(50,50,r);*/
+		var cv2 = cv.getContext("2d");
+		cv2.fillStyle = "#ffffff";
+		cv2.fillRect(0,0,100,100);
+	}
+	
 	if(!test){
 		socket.on('receivecolor', function(response){
 			var xpo = response.coord.x;
@@ -231,11 +252,11 @@ $(function(){
 			var rc = c.substring(0,3);
 			var gc = c.substring(3,6);
 			var bc = c.substring(6,8);
-
+			
 			var rhex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 			var ghex = Math.ceil((parseInt(rc, 2) * 36.4)).toString(16);
 			var bhex = Math.ceil((parseInt(rc, 2) * 85)).toString(16);
-
+			
 			if(rhex.length == 1){
 				rhex = "0"+rhex;
 			}
@@ -251,7 +272,7 @@ $(function(){
 			fill(xpo,ypo,r);
 		});
 	}
-
+	
 	addEventListener("mousemove",function(event){
 		if(!zooming){
 			writeMessage(cv);
@@ -369,9 +390,25 @@ $(function(){
 			moving = false;
 		}
 	});
+});//end $(function(){});
 
-	drawBoard();
-});
+/*function ChangeDrawing(){
+	if(drawing){
+		drawing = false;
+		
+		var n = document.getElementById("testbutton");
+		var message = "Moving"; 
+		n.textContent = message;
+	}
+	else{
+		drawing = true;
+		
+		var n = document.getElementById("testbutton");
+		var message = "Drawing"; 
+		n.textContent = message;
+	}
+	console.log("done");
+};*/
 
 function ZoomIn(){
 	z = z*2;
@@ -679,7 +716,7 @@ function changeColor(c){
 		c1x.fillStyle = color;
 		c1x.fillRect(0,0,2,2);
 		
-		var message = color;
+		var message = color; 
 		colortext.innerHTML = message;
 		
 		var r = Math.round((parseInt(color.substring(1,3), 16))/36.4);
@@ -702,10 +739,9 @@ function draw(xcoord,ycoord){
 	
 	var num = parseInt(rt,2) + parseInt(gt,2) + parseInt(bt,2);
 	var json = {coord: {x: xcoord, y: ycoord}, color: num};
-	var lk = baseUrl + '/pixel';
-	//TODO: check for valid token
+	var lk = 'http://localhost:5000/pixel?f=' + JSON.stringify(json);
 	var auth = "Bearer " + token;
-
+	
 	$.ajax({
 		url: lk,
 		headers: {
@@ -713,14 +749,14 @@ function draw(xcoord,ycoord){
 		},
 		//dataType: 'json',
 		type: 'POST',
-		contentType: "application/json; charset=utf-8",
+		//contentType: "application/json; charset=utf-8",
 		success: function(response){
-			//console.log(response);
+			console.log(response);
 		},
 		error: function(error){
 			console.log(error);
 		},
-		data: JSON.stringify(json)
+		//data: JSON.stringify(json)
 	});
 	
 	/*socket.emit('sendcolor', json);*/
