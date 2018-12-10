@@ -27,6 +27,18 @@ def configuration(state):
     YSIZE = state.app.config['BOARD_YSIZE']
     CDTIME = state.app.config['CD_TIME']
 
+    data = store.get('board')
+    if not data or len(data) < XSIZE*YSIZE:
+        # temp TODO: update this
+        board = store.bitfield('board')
+        for x in range(XSIZE):
+            for y in range(YSIZE):
+                pixel = store.zrevrange(f"pixel:timestamp:{x}:{y}",0,0)
+                color = store.hget(f"pixel:{pixel}",'color') or 0xff
+                board.set('u8', f"#{x+y*XSIZE}", color)
+        board.execute()
+
+
 @bp.route('/pixel', methods=['POST'])
 @jwt_required
 def draw():
