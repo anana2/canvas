@@ -91,4 +91,4 @@ def query():
 def get_board():
     data = store.get('board') or b''
     data = data.ljust(XSIZE * YSIZE, b'\x00')
-    return Response(data, 200, mimetype='application/octet-stream')
+    return Response(data, 200, mimetype='application/x-rgb8')
