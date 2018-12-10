@@ -151,6 +151,25 @@ if(!test){
 }
 
 $(function(){
+
+	cv = document.getElementById("canvas");
+	mid = document.getElementById("mid");
+	pos = document.getElementById("midpos");
+	sca = document.getElementById("midscale");
+	zoomlevel = document.getElementById("zoomlevel");
+	c1 = document.getElementById("color1");
+	c2 = document.getElementById("color2");
+	
+	red = document.getElementById("Red");
+	green = document.getElementById("Green");
+	blue = document.getElementById("Blue");
+	redtext = document.getElementById("redtext");
+	greentext = document.getElementById("greentext");
+	bluetext = document.getElementById("bluetext");
+	
+	mousepos = document.getElementById("colorstring");
+	colortext = document.getElementById("colorstring2");
+
 	changeColor("#000000");
 	
 	redrawColors(true,c2);
