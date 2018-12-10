@@ -13,9 +13,19 @@ log = logging.getLogger('flask.app.pixel')
 bp = Blueprint('pixel', __name__)
 
 
-XSIZE = 100
-YSIZE = 100
+XSIZE = 0
+YSIZE = 0
+CDTIME = 0
 
+
+@bp.record
+def configuration(state):
+    global XSIZE
+    global YSIZE
+    global CDTIME
+    XSIZE = state.app.config['BOARD_XSIZE']
+    YSIZE = state.app.config['BOARD_YSIZE']
+    CDTIME = state.app.config['CD_TIME']
 
 @bp.route('/pixel', methods=['POST'])
 @jwt_required
@@ -27,6 +37,14 @@ def draw():
     if 'x' not in data['coord'] or 'y' not in data['coord']:
         return 'wrong coordinates format', 400
 
+    user = get_jwt_identity()
+
+    # check cooldown
+    if store.get(f"lock:{user}") is not None:
+        return 'in cooldown, draw not available', 403
+
+    store.setex(f"lock:{user}",CDTIME,'_')
+
     # pixel id
     pid = store.incr('pixel:id')
     x = data['coord']['x']
@@ -35,7 +53,7 @@ def draw():
     pixel = {
         'id': pid,
         'timestamp' : int(time()),
-        'user' : get_jwt_identity(),
+        'user' : user,
         'coord' : f"{x}:{y}",
         'color' : color,
     }
