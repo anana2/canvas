@@ -2,9 +2,9 @@ from flask import Blueprint, request, jsonify, Response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from time import time, asctime
+from base64 import b64encode
 import logging
 import json
-import base64
 
 from canvasr import store, socket
 
@@ -108,5 +108,5 @@ def query():
 @bp.route('/board')
 def get_board():
     data = store.get('board') or b''
-    data = data.ljust(XSIZE * YSIZE, b'\x00')
-    return Response(data, 200, mimetype='application/x-rgb8')
+    data = data.ljust(XSIZE * YSIZE, b'\xff')
+    return Response(b64encode(data), 200, mimetype='application/x-rgb8')
