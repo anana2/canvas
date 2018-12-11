@@ -624,7 +624,7 @@ function draw(xcoord,ycoord){
 		type: 'POST',
 		contentType: "application/json; charset=utf-8",
 		success: function(response){
-			savedcolor = null;
+			savedcolor = color;
 			//console.log(response);
 		},
 		error: function(error){
