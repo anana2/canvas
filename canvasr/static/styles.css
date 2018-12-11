@@ -1,28 +1,51 @@
 html{
-	height:100vh;
+	height:100%;
+}
+body{
+	display: flex;
+	flex-flow: column;
+	height: 100%;
+	overflow: hidden;
 }
 
 .info{
 	display: inline-block;
 }
 div#top{
+	background-color: white;
+	width: 100%;
+	height: fit-content;
+	z-index: 1;
 }
 div#mid{
+	position: relative;
 	image-rendering: pixelated;
 	background-color: gray;
 	width: 100%;
-	height: 90vh;
-	overflow:hidden;
+	flex-grow: 1;
+	overflow: hidden;
+	z-index: 0;
 }
 div#midpos{
 	transform: translate(0px,0px);
 	height: 100%;
 }
 div#midscale{
+	display: block;
+	position: absolute;
 	transform: scale(1,1);
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+}
+div#canvas{
 	height: 100%;
 }
 div#bottom{
+	background-color: white;
+	width: 100%;
+	height: fit-content;
+	z-index:1;
 }
 div#bottomleft{
 	display: inline-block;
