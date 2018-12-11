@@ -393,7 +393,8 @@ function writeMessage(canvas){
 		mousex = Math.floor(realmousex);
 		mousey = Math.floor(realmousey);
 	}
-	else if(tempx != mousex || tempy != mousey){
+	//if mouse position has gone from a pixel to another pixel (else no changes necessary)
+	if(tempx != mousex || tempy != mousey){
 		//if previous pixel is in canvas
 		if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
 			//if mouse leaves pixel and color != actual canvas color, go back to canvas color
@@ -403,18 +404,6 @@ function writeMessage(canvas){
 				savedcolor = null;
 			}
 		}
-	}
-	//if mouse position has gone from a pixel to another pixel (else no changes necessary)
-	if(tempx != mousex || tempy != mousey){
-		//if previous pixel is in canvas
-		/*if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
-			//if mouse leaves pixel and color != actual canvas color, go back to canvas color
-			if(savedcolor != null){
-				ctx.fillStyle = getCurrentColor(savedcolor);
-				ctx.fillRect(tempx,tempy,1,1);
-				savedcolor = null;
-			}
-		}*/
 		//if current pixel is in canvas
 		if(mousex > -1 && mousex < 100 && mousey > -1 && mousey < 100){
 			//if color of current pixel is not selected paint color (if it is, theres no need for highlighting)
@@ -579,27 +568,55 @@ function redrawColors(complete){
 	}
 }
 function changeColor(c){
-	console.log(c);
 	color = c;
 	var c1x = c1.getContext("2d");
 	if(color == null){
-		c1x.fillStyle = "#bbbbbb";
-		c1x.fillRect(0, 0, 1, 1);
-		c1x.fillRect(1, 1, 1, 1);
-		c1x.fillStyle = "#000000";
-		c1x.fillRect(1, 0, 1, 1);
-		c1x.fillRect(0, 1, 1, 1);
+		if(savedcolor != null){
+			var ctx = cv.getContext("2d");
+			ctx.fillStyle = getCurrentColor(savedcolor);
+			ctx.fillRect(mousex,mousey,1,1);
+			savedcolor = null;
+		}
+		if(mousex > -1 && mousex < 100 && mousey > -1 && mousey < 100){
+			c1x.fillStyle = getColor(mousex,mousey);
+			c1x.fillRect(0,0,2,2);
+
+			var tempcolor = getColor(mousex,mousey);
+			var message = "Sampler: " + tempcolor;
+			colortext.innerHTML = message;
+							
+			var tempcolorint = getColorInt(mousex,mousey);
+			var r = palette.red.indexOf(getRed(tempcolorint));
+			var g = palette.green.indexOf(getGreen(tempcolorint));
+			var b = palette.blue.indexOf(getBlue(tempcolorint));
+							
+			red.value = r;
+			green.value = g;
+			blue.value = b;
+							
+			redtext.innerHTML = "R: "+r;
+			greentext.innerHTML = "G: "+g;
+			bluetext.innerHTML = "B: "+b;
+		}
+		else{
+			c1x.fillStyle = "#bbbbbb";
+			c1x.fillRect(0, 0, 1, 1);
+			c1x.fillRect(1, 1, 1, 1);
+			c1x.fillStyle = "#000000";
+			c1x.fillRect(1, 0, 1, 1);
+			c1x.fillRect(0, 1, 1, 1);
+				
+			var message = "Sampler";
+			colortext.innerHTML = message;
 			
-		var message = "Sampler";
-		colortext.innerHTML = message;
-		
-		red.value = 0;
-		green.value = 0;
-		blue.value = 0;
-		
-		redtext.innerHTML = "R: N/A"
-		greentext.innerHTML = "G: N/A"
-		bluetext.innerHTML = "B: N/A"
+			red.value = 0;
+			green.value = 0;
+			blue.value = 0;
+			
+			redtext.innerHTML = "R: N/A"
+			greentext.innerHTML = "G: N/A"
+			bluetext.innerHTML = "B: N/A"
+		}
 	}
 	else{
 		c1x.fillStyle = getCurrentColor(color);
