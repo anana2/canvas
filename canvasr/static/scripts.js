@@ -1,4 +1,4 @@
-var baseUrl = document.baseURI
+var baseUrl = document.baseURI;
 
 var map = [];
 for(var i = 0; i < 100; i++){
@@ -40,7 +40,7 @@ var moving = false;
 var zooming = false;
 var interval;
 var color = "#000000";
-var lastcolor = ""
+var lastcolor = "";
 
 var cv = document.getElementById("canvas");
 var mid = document.getElementById("mid");
