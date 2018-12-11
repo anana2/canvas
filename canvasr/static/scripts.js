@@ -521,7 +521,6 @@ function drawCanvas(canvas){
 		if(!base){
 			redrawColors(false);
 		}
-		savedcolor = null;
 		draw(mousex,mousey);
 	}
 };
@@ -625,6 +624,7 @@ function draw(xcoord,ycoord){
 		type: 'POST',
 		contentType: "application/json; charset=utf-8",
 		success: function(response){
+			savedcolor = null;
 			//console.log(response);
 		},
 		error: function(error){
