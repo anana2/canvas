@@ -401,6 +401,7 @@ function writeMessage(canvas){
 			if(savedcolor != null){
 				ctx.fillStyle = getCurrentColor(savedcolor);
 				ctx.fillRect(tempx,tempy,1,1);
+				savedcolor = null;
 			}
 		}
 		//if current pixel is in canvas
