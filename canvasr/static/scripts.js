@@ -393,8 +393,7 @@ function writeMessage(canvas){
 		mousex = Math.floor(realmousex);
 		mousey = Math.floor(realmousey);
 	}
-	//if mouse position has gone from a pixel to another pixel (else no changes necessary)
-	if(tempx != mousex || tempy != mousey){
+	else if(tempx != mousex || tempy != mousey){
 		//if previous pixel is in canvas
 		if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
 			//if mouse leaves pixel and color != actual canvas color, go back to canvas color
@@ -404,6 +403,18 @@ function writeMessage(canvas){
 				savedcolor = null;
 			}
 		}
+	}
+	//if mouse position has gone from a pixel to another pixel (else no changes necessary)
+	if(tempx != mousex || tempy != mousey){
+		//if previous pixel is in canvas
+		/*if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
+			//if mouse leaves pixel and color != actual canvas color, go back to canvas color
+			if(savedcolor != null){
+				ctx.fillStyle = getCurrentColor(savedcolor);
+				ctx.fillRect(tempx,tempy,1,1);
+				savedcolor = null;
+			}
+		}*/
 		//if current pixel is in canvas
 		if(mousex > -1 && mousex < 100 && mousey > -1 && mousey < 100){
 			//if color of current pixel is not selected paint color (if it is, theres no need for highlighting)
