@@ -26,10 +26,10 @@
 <!-- <button id="login" onclick="Login('test', 'password')">Login-</button> -->
 <div ng-app="app" ng-controller="AppController as login" class="md-padding dialogdemoBasicUsage" id="popupContainer" ng-cloak>
   <div class="dialog-demo-content" layout="row" layout-wrap layout-margin layout-align="center">
-    <md-button class="md-primary md-raised" ng-if="!(login.loggedIn)" ng-click="login.showLoginDialog($event)">
+    <md-button class="md-primary md-raised" ng-if="!(login.buttonShow)" ng-click="login.showLoginDialog($event)">
       Login
     </md-button>
-    <md-button class="md-primary md-raised" ng-if="!(login.loggedIn)" ng-click="login.showRegisterDialog($event)">
+    <md-button class="md-primary md-raised" ng-if="!(login.buttonShow)" ng-click="login.showRegisterDialog($event)">
       Register
     </md-button>
   </div>

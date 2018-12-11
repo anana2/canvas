@@ -11,7 +11,7 @@ var AppController = /** @class */ (function () {
       this.$mdDialog = $mdDialog;
       this.$mdMedia = $mdMedia;
       this.$mdToast = $mdToast;
-      this.loggedIn = false;
+      this.buttonShow = false;
       this.status = '';
       this.customFullscreen = this.$mdMedia('xs') || this.$mdMedia('sm');
   }
@@ -65,7 +65,10 @@ var LoginDialogController = /** @class */ (function () {
   };
   LoginDialogController.prototype.login = function () {
       this.$mdDialog.hide({username: this.username, password: this.password});
-      this.loggedIn = Login(this.username, this.password);
+      Login(this.username, this.password);
+      // console.log(bool);
+      console.log(loggedIn);
+      this.buttonShow = loggedIn;
   };
   return LoginDialogController;
 }());
@@ -81,7 +84,11 @@ var RegisterDialogController = /** @class */ (function () {
   };
   RegisterDialogController.prototype.register = function () {
       this.$mdDialog.hide({username: this.username, password: this.password});
-      this.loggedIn = Register(this.username, this.password);
+      Register(this.username, this.password);
+      // console.log(bool);
+      console.log(loggedIn);
+      this.buttonShow = loggedIn;
+
   };
   return RegisterDialogController;
 }());
