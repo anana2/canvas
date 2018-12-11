@@ -1,27 +1,26 @@
 var baseUrl = document.baseURI;
-var path = baseUrl + '/board';
 
+var map = [];
+for(var i = 0; i < 100; i++){
+	map[i] = [];
+	for(var j = 0; j < 100; j++){
+		map[i][j] = "#ffffff";
+	}
+}
 var map2 = [];
 for(var i = 0; i < 20; i++){
 	map2[i] = null;
 }
-map2[0] = 255;
-map2[1] = 0;
-map2[2] = 224;
-map2[3] = 236;
-map2[4] = 252;
-map2[5] = 28;
-map2[6] = 31;
-map2[7] = 15;
-map2[8] = 3;
-map2[9] = 227;
-
-// 8-bit pallete
-var palette = {
-    red: [0,36,72,109,145,182,218,255],
-    green: [0,36,72,109,145,182,218,255],
-    blue: [0,85,170,255]
-};
+map2[0] = "#ffffff";
+map2[1] = "#000000";
+map2[2] = "#ff0000";
+map2[3] = "#ff6e00";
+map2[4] = "#ffff00";
+map2[5] = "#00ff00";
+map2[6] = "#00ffff";
+map2[7] = "#006eff";
+map2[8] = "#0000ff";
+map2[9] = "#ff00ff";
 
 var x = 0;
 var y = 0;
@@ -40,8 +39,8 @@ var drawing = true;
 var moving = false;
 var zooming = false;
 var interval;
-var color = 0;
-var savedcolor = null;
+var color = "#000000";
+var lastcolor = "";
 
 var cv = document.getElementById("canvas");
 var mid = document.getElementById("mid");
@@ -67,12 +66,9 @@ var loggedIn = false;
 var errMsg = null;
 var username = null;
 
-// socketio
-const socket = io('/pixel');
-
 function Login(username, password){
 	var json = {user: username, pasw: password};
-	var path = baseUrl + '/login';
+	var path = baseUrl + 'login';
 	$.ajax({
 		url: path,
 		data: JSON.stringify(json),
@@ -103,9 +99,10 @@ function Login(username, password){
 		},
 	});
 }
+
 function Register(username, password){
 	var json = {user: username, pasw: password};
-	var path = baseUrl + '/register';
+	var path = baseUrl + 'register';
 	$.ajax({
 		url: path,
 		data: JSON.stringify(json),
@@ -132,12 +129,14 @@ function Register(username, password){
 		},
 	});
 }
+
 function ResetAuth(){
 	//	TODO: angular_js reset authentication box (intial tab: login tab)
 	username = null;
 	token = null;
 	loggedIn = false;
 }
+
 function AuthOver(usernameSet, tokenSet){
 	username = usernameSet;
 	token = tokenSet;
@@ -154,14 +153,33 @@ $(function() {
 		loggedIn = true;
 });
 
-//initialize board colors and stuff
-$(function(){
-	//gotta fill the entire canvas with white, cuz else canvas has "empty" pixels that returns 0
-	//for testing without server
-	const fillImg = $('#canvas')[0].getContext('2d');
-	fillImg.fillStyle = "#ffffff";
-	fillImg.fillRect(0,0,100,100);
-	
+
+
+// 8-bit pallete
+
+var palette = {
+    red: [0,36,72,109,145,182,218,255],
+    green: [0,36,72,109,145,182,218,255],
+    blue: [0,85,170,255]
+};
+
+function drawPixel(coord, color) {
+	const ctx = $('#canvas')[0].getContext('2d');
+	ctx.fillStyle =
+		'rgba('
+		+ palette.red[(color & 0b11100000) >> 5] + ","
+		+ palette.green[(color & 0b00011100) >> 2] + ","
+		+ palette.blue[(color & 0b00000011)] + ","
+		+ "1)";
+	ctx.fillRect(coord.x,coord.y,1,1)
+}
+
+
+
+// get board on start
+
+$(function() {
+	var path = baseUrl + 'board';
 	$.ajax(path, {
 		accepts: {
 			xrgb8: 'application/x-rgb8'
@@ -191,26 +209,77 @@ $(function(){
 			image.data.set(new Uint8ClampedArray(data));
 			ctx.putImageData(image,0,0);
 
-			/*// TEMP FIX FOR MAP
+			// TEMP FIX FOR MAP
 			//TODO: PLEASE DON"T USE A MAP
 			for (var x = 0; x < 100; x++)
 				for (var y = 0; y < 100; y++)
-					fill(x,y,getColor(x,y));*/
+					fill(x,y,getColor({x:x,y:y}));
 		}
 	});
 });
 
-//socket thing
+
+
+// socketio
+
+const socket = io('/pixel');
+
 socket.on('post', function(data) {
-	fill(data.coord.x, data.coord.y, data.color);
+	drawPixel(data.coord,data.color)
+
+	// TEMP FIX FOR MAP
+	//TODO: PLEASE DON"T USE A MAP
+	fill(data.coord.x,data.coord.y,getColor(data.coord))
 });
 
-//setup controls and stuff
-$(function(){
-	changeColor(0);
-	redrawColors(true);
 
-	addEventListener("mousemove",function(event){
+
+
+
+
+
+
+function getColor(coord) {
+	var ctx = $('#canvas')[0].getContext('2d');
+	var pixel = ctx.getImageData(coord.x,coord.y,1,1);
+	var data = pixel.data;
+	return "rgba("
+		+ data[0] + ","
+		+ data[1] + ","
+		+ data[2] + ","
+		+ (data[3]/255) + ")";
+}
+
+
+$(function(){
+
+	//TODO:
+	cv = document.getElementById("canvas");
+	mid = document.getElementById("mid");
+	pos = document.getElementById("midpos");
+	sca = document.getElementById("midscale");
+	zoomlevel = document.getElementById("zoomlevel");
+	c1 = document.getElementById("color1");
+	c2 = document.getElementById("color2");
+
+	red = document.getElementById("Red");
+	green = document.getElementById("Green");
+	blue = document.getElementById("Blue");
+	redtext = document.getElementById("redtext");
+	greentext = document.getElementById("greentext");
+	bluetext = document.getElementById("bluetext");
+
+	mousepos = document.getElementById("colorstring");
+	colortext = document.getElementById("colorstring2");
+
+
+
+	changeColor("#000000");
+
+	redrawColors(true,c2);
+
+
+	addEventListener('mousemove',function(event){
 		if(!zooming){
 			writeMessage(cv);
 		}
@@ -230,35 +299,92 @@ $(function(){
 		changeColor(map2[index]);
 	});
 	red.oninput = function() {
-		var num = ((red.value << 5) & 0b11100000) | ((green.value << 2) & 0b00011100) | ((blue.value) & 0b00000011);
-		changeColor(num);
+		var rt = (Math.ceil(parseInt(red.value) * 36.4)).toString(16);
+		var gt = (Math.ceil(parseInt(green.value) * 36.4)).toString(16);
+		var bt = (Math.ceil(parseInt(blue.value) * 85)).toString(16);
+		if(rt.length == 1){
+			rt = "0"+rt;
+		}
+		if(gt.length == 1){
+			gt = "0"+gt;
+		}
+		if(bt.length == 1){
+			bt = "0"+bt;
+		}
+		changeColor("#"+rt+gt+bt);
 	}
 	green.oninput = function() {
-		var num = ((red.value << 5) & 0b11100000) | ((green.value << 2) & 0b00011100) | ((blue.value) & 0b00000011);
-		changeColor(num);
+		var rt = (Math.ceil(parseInt(red.value) * 36.4)).toString(16);
+		var gt = (Math.ceil(parseInt(green.value) * 36.4)).toString(16);
+		var bt = (Math.ceil(parseInt(blue.value) * 85)).toString(16);
+		if(rt.length == 1){
+			rt = "0"+rt;
+		}
+		if(gt.length == 1){
+			gt = "0"+gt;
+		}
+		if(bt.length == 1){
+			bt = "0"+bt;
+		}
+		changeColor("#"+rt+gt+bt);
 	}
 	blue.oninput = function() {
-		var num = ((red.value << 5) & 0b11100000) | ((green.value << 2) & 0b00011100) | ((blue.value) & 0b00000011);
-		changeColor(num);
+		var rt = (Math.ceil(parseInt(red.value) * 36.4)).toString(16);
+		var gt = (Math.ceil(parseInt(green.value) * 36.4)).toString(16);
+		var bt = (Math.ceil(parseInt(blue.value) * 85)).toString(16);
+		if(rt.length == 1){
+			rt = "0"+rt;
+		}
+		if(gt.length == 1){
+			gt = "0"+gt;
+		}
+		if(bt.length == 1){
+			bt = "0"+bt;
+		}
+		changeColor("#"+rt+gt+bt);
 	}
 	cv.addEventListener("mousedown",function(event){
 		downx = event.clientX;
 		downy = event.clientY;
 		drawing = true;
+		/*if(drawing){
+			drawCanvas(cv);
+			interval = setInterval(function(){
+				drawCanvas(cv);
+			}, 10);
+		}*/
 	});
 	mid.addEventListener("mousedown",function(event){
+		/*if(!drawing){
+			clickx = mousex;
+			clicky = mousey;
+			moving = true;
+			interval = setInterval(function(){}, 1000);
+		}*/
 		clickx = realmousex;
 		clicky = realmousey;
 		moving = true;
+		//interval = setInterval(function(){}, 1000);
 	});
 	mid.addEventListener("wheel",function(event){
 		clickx = realmousex;
 		clicky = realmousey;
+		/*if(clickx < 0){
+			clickx = 0;
+		}else if(clickx > 999){
+			clickx = 999;
+		}
+		if(clicky < 0){
+			clicky = 0;
+		}else if(clicky > 999){
+			clicky = 999;
+		}*/
 		zooming = true;
 		var dir = Math.sign(event.wheelDelta);
 		Zoom(dir);
 		zooming = false;
 	});
+	
 	addEventListener("mouseup",function(event){
 		if(Math.abs(event.clientX-downx) < 5 && Math.abs(event.clientY-downy) < 5 && drawing){
 			moving = false;
@@ -266,12 +392,12 @@ $(function(){
 			drawCanvas(cv);
 		}
 		else{
+			//clearInterval(interval);
 			moving = false;
 		}
 	});
 });
 
-//all movement/drawing functions
 function ZoomIn(){
 	z = z*2;
 	if(z > 64){
@@ -347,8 +473,8 @@ function Zoom(amount){
 function writeMessage(canvas){
 	var ctx = canvas.getContext("2d");
 	var c1x = c1.getContext("2d");
-	if(color != null){
-		ctx.fillStyle = getCurrentColor(color);
+	if(color != null && color != "sampler"){
+		ctx.fillStyle = color;
 	}
 	var rect = canvas.getBoundingClientRect();
 	var width = rect.right - rect.left;
@@ -365,7 +491,6 @@ function writeMessage(canvas){
 	mousex = Math.floor(realmousex);
 	mousey = Math.floor(realmousey);
 	
-	//either while zooming or while moving (mousedown and drag)
 	if(moving || zooming){
 		diffx = realmousex-clickx;
 		diffy = realmousey-clicky;
@@ -393,38 +518,32 @@ function writeMessage(canvas){
 		mousex = Math.floor(realmousex);
 		mousey = Math.floor(realmousey);
 	}
-	//if mouse position has gone from a pixel to another pixel (else no changes necessary)
-	if(tempx != mousex || tempy != mousey){
-		//if previous pixel is in canvas
+	else if(tempx != mousex || tempy != mousey){
 		if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
-			//if mouse leaves pixel and color != actual canvas color, go back to canvas color
-			if(savedcolor != null){
-				ctx.fillStyle = getCurrentColor(savedcolor);
+			if(color != map[tempx][tempy]){
+				ctx.fillStyle = map[tempx][tempy];
 				ctx.fillRect(tempx,tempy,1,1);
 			}
+			
 		}
-		//if current pixel is in canvas
+	}
+	if(tempx != mousex || tempy != mousey){
 		if(mousex > -1 && mousex < 100 && mousey > -1 && mousey < 100){
-			//if color of current pixel is not selected paint color (if it is, theres no need for highlighting)
-			if(getColorInt(mousex, mousey) != color){
-				//if selected paint color is SAMPLER (no highlight)
+			if(map[mousex][mousey] != color){
 				if(color == null){
-					savedcolor = null;
-					//if previous pixel was in canvas
 					if(tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100){
-						//if previous pixel color is not current pixel color (change bottom color display)
-						if(getColorInt(mousex,mousey) != getColorInt(tempx,tempy)){
-							c1x.fillStyle = getColor(mousex,mousey);
+						if(map[mousex][mousey] != map[tempx][tempy]){
+							console.log("this");
+							c1x.fillStyle = map[mousex][mousey];
 							c1x.fillRect(0,0,2,2);
 
-							var tempcolor = getColor(mousex,mousey);
+							var tempcolor = map[mousex][mousey];
 							var message = "Sampler: " + tempcolor;
 							colortext.innerHTML = message;
-							
-							var tempcolorint = getColorInt(mousex,mousey);
-							var r = palette.red.indexOf(getRed(tempcolorint));
-							var g = palette.green.indexOf(getGreen(tempcolorint));
-							var b = palette.blue.indexOf(getBlue(tempcolorint));
+					
+							var r = Math.round((parseInt(tempcolor.substring(1,3), 16))/36.4);
+							var g = Math.round((parseInt(tempcolor.substring(3,5), 16))/36.4);
+							var b = Math.round((parseInt(tempcolor.substring(5,7), 16))/85);
 							
 							red.value = r;
 							green.value = g;
@@ -435,19 +554,17 @@ function writeMessage(canvas){
 							bluetext.innerHTML = "B: "+b;
 						}
 					}
-					//previous pixel not in canvas (change bottom color display)
 					else{
-						c1x.fillStyle = getColor(mousex,mousey);
+						c1x.fillStyle = map[mousex][mousey];
 						c1x.fillRect(0,0,2,2);
 
-						var tempcolor = getColor(mousex,mousey);
+						var tempcolor = map[mousex][mousey];
 						var message = "Sampler: " + tempcolor;
 						colortext.innerHTML = message;
-							
-						var tempcolorint = getColorInt(mousex,mousey);
-						var r = palette.red.indexOf(getRed(tempcolorint));
-						var g = palette.green.indexOf(getGreen(tempcolorint));
-						var b = palette.blue.indexOf(getBlue(tempcolorint));
+						
+						var r = Math.round((parseInt(tempcolor.substring(1,3), 16))/36.4);
+						var g = Math.round((parseInt(tempcolor.substring(3,5), 16))/36.4);
+						var b = Math.round((parseInt(tempcolor.substring(5,7), 16))/85);
 							
 						red.value = r;
 						green.value = g;
@@ -458,20 +575,12 @@ function writeMessage(canvas){
 						bluetext.innerHTML = "B: "+b;
 					}
 				}
-				//selected paint color is valid (save actual color, and highlight)
 				else{
-					savedcolor = getColorInt(mousex,mousey);
-					ctx.fillStyle = getCurrentColor(color);
+					ctx.fillStyle = color;
 					ctx.fillRect(mousex,mousey,1,1);
 				}
 			}
-			//clear highlight
-			else{
-				savedcolor = null;
-			}
 		}
-		//current pixel NOT in canvas, previous pixel in canvas, paint color is SAMPLER
-		//change color display to sampler default
 		else if(color == null && (tempx > -1 && tempx < 100 && tempy > -1 && tempy < 100)){
 			c1x.fillStyle = "#bbbbbb";
 			c1x.fillRect(0, 0, 1, 1);
@@ -491,16 +600,19 @@ function writeMessage(canvas){
 			greentext.innerHTML = "G: N/A";
 			bluetext.innerHTML = "B: N/A";
 		}
+		else{
+			
+		}
 	}
-	
+
 	var message = "x:"+mousex+" y:"+mousey+""; 
 	mousepos.innerHTML = message;
 };
 function drawCanvas(canvas){
 	if(color == null){
-		changeColor(getColorInt(mousex, mousey));
+		changeColor(map[mousex][mousey]);
 	}
-	else if(color != savedcolor){
+	else if(color != map[mousex][mousey]){
 		var base = false;
 		var prev = color;
 		for(var i = 0; i < 19; i++){
@@ -519,26 +631,24 @@ function drawCanvas(canvas){
 			}
 		}
 		if(!base){
-			redrawColors(false);
+			redrawColors(false,c2);
 		}
-		savedcolor = null;
+		
 		draw(mousex,mousey);
 	}
 };
 function fill(xpos,ypos,c){
+	map[xpos][ypos] = c;
 	var ctx = canvas.getContext("2d");
 	if(c == null){
 		ctx.clearRect(xpos,ypos,1,1);
 	}
-	else if(color != null && xpos == mousex && ypos == mousey){
-		savedcolor = c;
-	}
 	else{
-		ctx.fillStyle = getCurrentColor(c);
+		ctx.fillStyle = c;
 		ctx.fillRect(xpos,ypos,1,1);
 	}
 }
-function redrawColors(complete){
+function redrawColors(complete,canvas){
 	var range = 0;
 	var end = 20;
 	var c2x = c2.getContext("2d");
@@ -562,13 +672,12 @@ function redrawColors(complete){
 			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3+1, 1, 1);
 		}
 		else{
-			c2x.fillStyle = getCurrentColor(map2[i]);
+			c2x.fillStyle = map2[i];
 			c2x.fillRect((3*i)%30, (Math.floor(i/10))*3, 2, 2);
 		}
 	}
 }
 function changeColor(c){
-	console.log(c);
 	color = c;
 	var c1x = c1.getContext("2d");
 	if(color == null){
@@ -591,28 +700,33 @@ function changeColor(c){
 		bluetext.innerHTML = "B: N/A"
 	}
 	else{
-		c1x.fillStyle = getCurrentColor(color);
+		c1x.fillStyle = color;
 		c1x.fillRect(0,0,2,2);
 		
-		var message = getCurrentColor(color);
+		var message = color;
 		colortext.innerHTML = message;
 		
-		var r = palette.red.indexOf(getRed(color));
-		var g = palette.green.indexOf(getGreen(color));
-		var b = palette.blue.indexOf(getBlue(color));
-							
+		var r = Math.round((parseInt(color.substring(1,3), 16))/36.4);
+		var g = Math.round((parseInt(color.substring(3,5), 16))/36.4);
+		var b = Math.round((parseInt(color.substring(5,7), 16))/85);
+		
 		red.value = r;
 		green.value = g;
 		blue.value = b;
-							
+		
 		redtext.innerHTML = "R: "+r;
 		greentext.innerHTML = "G: "+g;
 		bluetext.innerHTML = "B: "+b;
 	}	
 };
 function draw(xcoord,ycoord){
-	var json = {coord: {x: xcoord, y: ycoord}, color: color};
-	var lk = baseUrl + '/pixel';
+	var rt = (parseInt(red.value)).toString(2) + "00000";
+	var gt = (parseInt(green.value)).toString(2) + "00";
+	var bt = (parseInt(blue.value)).toString(2);
+	
+	var num = parseInt(rt,2) + parseInt(gt,2) + parseInt(bt,2);
+	var json = {coord: {x: xcoord, y: ycoord}, color: num};
+	var lk = baseUrl + 'pixel';
 	//TODO: check for valid token
 	var auth = "Bearer " + token;
 
@@ -628,49 +742,10 @@ function draw(xcoord,ycoord){
 			//console.log(response);
 		},
 		error: function(error){
-			//console.log(error);
+			console.log(error);
 		},
 		data: JSON.stringify(json)
 	});
-}
-
-//all getcolor functions
-function getColor(coordx, coordy) {
-	var ctx = $('#canvas')[0].getContext('2d');
-	var pixel = ctx.getImageData(coordx,coordy,1,1);
-	var data = pixel.data;
-	return "rgba("
-		+ data[0] + ","
-		+ data[1] + ","
-		+ data[2] + ","
-		+ (data[3]/255) + ")";
-}
-function getColorInt(coordx, coordy){
-	var ctx = $('#canvas')[0].getContext('2d');
-	var pixel = ctx.getImageData(coordx,coordy,1,1);
-	var data = pixel.data;
-	var result = (palette.red.indexOf(data[0]) << 5) | (palette.green.indexOf(data[1]) << 2) | (palette.blue.indexOf(data[2]));
-	return result;
-}
-function getCurrentColor(c){
-	var r = palette.red[(c & 0b11100000) >> 5];
-	var g = palette.green[(c & 0b00011100) >> 2];
-	var b = palette.blue[(c & 0b00000011)];
-	return "rgba("
-		+ r + ","
-		+ g + ","
-		+ b + ","
-		+ "1)";
-}
-function getRed(c){
-	var r = palette.red[(c & 0b11100000) >> 5];
-	return r;
-}
-function getGreen(c){
-	var g = palette.green[(c & 0b00011100) >> 2];
-	return g;
-}
-function getBlue(c){
-	var b = palette.blue[(c & 0b00000011)];
-	return b;
+	
+	/*socket.emit('sendcolor', json);*/
 }
