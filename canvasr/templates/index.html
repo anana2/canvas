@@ -25,21 +25,15 @@
 <!-- <button id="login" onclick="Login('test', 'password')">Login-</button> -->
 <div ng-app="app" ng-controller="AppController as login" class="md-padding dialogdemoBasicUsage" id="popupContainer" ng-cloak>
   <div class="dialog-demo-content" layout="row" layout-wrap layout-margin layout-align="center">
-    <md-button class="md-primary md-raised" ng-click="login.showLoginDialog($event)">
+    <md-button class="md-primary md-raised" ng-if="!login.loggedIn" ng-click="login.showLoginDialog($event)">
       Login
     </md-button>
-    <md-button class="md-primary md-raised" ng-click="login.showRegisterDialog($event)">
+    <md-button class="md-primary md-raised" ng-if="!login.loggedIn" ng-click="login.showRegisterDialog($event)">
       Register
     </md-button>
   </div>
   <div hide-gt-sm layout="row" layout-align="center center" flex>
     <md-checkbox ng-model="login.customFullscreen" aria-label="Fullscreen Custom Dialog">Force Custom Dialog Fullscreen</md-checkbox>
-  </div>
-
-  <div ng-if="login.status" id="status">
-    <b layout="row" layout-align="center center" class="md-padding">
-      {a login.status a}
-    </b>
   </div>
 
   <script type="text/ng-template" id="login-dialog.template.html">
