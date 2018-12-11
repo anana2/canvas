@@ -84,6 +84,7 @@ function Login(username, password){
 			// token = response.['access_token'];
 			// token = response.access_token;
 			AuthOver(username, response['access_token']);
+			return true;
 			/*
 			else if(response.status == 401){
 				console.log(response['msg']);
@@ -100,6 +101,7 @@ function Login(username, password){
 		},
 		error: function(error){
 			console.log(error);
+			return false;
 		},
 	});
 }
@@ -118,17 +120,21 @@ function Register(username, password){
 				// token = response.['access_token'];
 				// token = response.access_token;
 				AuthOver(username, response['access_token']);
+				return true;
 			}
 			else if(response.status == 403){
 				console.log(response['msg']);
 				errMsg = "Username already taken";
+				return true;
 			}
 			else {
 				console.log(response['msg']);
+				return true;
 			}
 		},
 		error: function(error){
 			console.log(error);
+			return false;
 		},
 	});
 }

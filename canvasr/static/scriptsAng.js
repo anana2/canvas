@@ -65,8 +65,7 @@ var LoginDialogController = /** @class */ (function () {
   };
   LoginDialogController.prototype.login = function () {
       this.$mdDialog.hide({username: this.username, password: this.password});
-      Login(this.username, this.password);
-      this.loggedIn = loggedIn;
+      this.loggedIn = Login(this.username, this.password);
   };
   return LoginDialogController;
 }());
@@ -82,8 +81,7 @@ var RegisterDialogController = /** @class */ (function () {
   };
   RegisterDialogController.prototype.register = function () {
       this.$mdDialog.hide({username: this.username, password: this.password});
-      Register(this.username, this.password);
-      this.loggedIn = loggedIn;
+      this.loggedIn = Register(this.username, this.password);
   };
   return RegisterDialogController;
 }());
