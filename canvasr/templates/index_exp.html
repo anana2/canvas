@@ -25,37 +25,43 @@
         </div>
     </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div id="color_display" class="d-inline" style="width: 64px; height: 64px; background-color: black;"></div>
+            <div id="color_display" class="d-inline mr-2" style="width: 64px; height: 64px; background-color: black;"></div>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
         <!-- nav container -->
         <div class="collapse navbar-collapse" id="navbarCollapse">
-            <!-- bottom controls -->
-            <div class="container my-2 mw-100" style="width: 512px">
-                <div class="w-100">
-                    <input id="color_selector_red" data-color="red" type="range" min="0" max="7" value="0" class="slider">
-                </div>
-                <div class="w-100">
-                    <input id="color_selector_green" data-color="green" type="range" min="0" max="7" value="0" class="slider">
-                </div>
-                <div class="w-100">
-                    <input id="color_selector_blue" data-color="blue" type="range" min="0" max="3" value="0" class="slider">
-                </div>
-            </div>
-            <!-- login registration logout -->
-            <form class="form-inline visible">
-                <div class="container d-flex flex-wrap justify-content-end">
-                    <div class="input-group input-group-sm mx-2">
-                        <input class="form-control" type="text" placeholder="username" aria-label="Username">
-                        <input class="form-control" type="password" placeholder="password" aria-label="Password">
-                        <div class="input-group-append">
-                            <button class="btn btn-secondary" id="login" type="button">login</button>
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- bottom controls -->
+                    <div class="col-sm">
+                        <div class="my-2 d-xl-flex flex-column align-items-center" style="max-width: 512px;">
+                            <div class="w-100">
+                                <input id="color_selector_red" data-color="red" type="range" min="0" max="7" value="0" class="slider my-2">
+                            </div>
+                            <div class="w-100">
+                                <input id="color_selector_green" data-color="green" type="range" min="0" max="7" value="0" class="slider my-2">
+                            </div>
+                            <div class="w-100">
+                                <input id="color_selector_blue" data-color="blue" type="range" min="0" max="3" value="0" class="slider my-2">
+                            </div>
                         </div>
                     </div>
-                    <button class="btn btn-link btn-sm ml-1" id="register_logout" type="button">register</button>
+                    <!-- login registration logout -->
+                    <div class="col-md-6 col-lg-6 col-xl-6">
+                        <form class="container-fluid form-inline visible d-flex justify-content-end my-3">
+                            <div class="input-group input-group-sm">
+                                <input class="form-control" type="text" placeholder="username" aria-label="Username">
+                                <input class="form-control" type="password" placeholder="password" aria-label="Password">
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" id="login" type="button">login</button>
+                                </div>
+                            </div>
+                            <button class="btn btn-link btn-sm ml-1" id="register_logout" type="button">register</button>
+                        </form>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </nav>
     <!-- Optional JavaScript -->
