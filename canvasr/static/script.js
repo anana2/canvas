@@ -154,6 +154,7 @@ $('#register_form').submit(function(ev) {
 	ev.preventDefault();
 	user = $('#register_user').val();
 	pasw = $('#register_pasw').val();
+	$('#registration').modal('hide');
 	register(user, pasw);
 })
 
