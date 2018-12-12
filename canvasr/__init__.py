@@ -44,7 +44,7 @@ def create_app(**kwargs):
 
     @app.route('/')
     def root():
-        return render_template('index_exp.html')
+        return render_template('index.html')
 
     @app.route('/greet')
     def greeting():

@@ -306,18 +306,6 @@ $(function() {
 
 /* canvas interactions
 */
-
-var h = new Hammer($('#canvas')[0]);
-h.get('pinch').set({ enable: true });
-h.get('rotate').set({ enable: true });
-h.get('pan').set({ direction: Hammer.DIRECTION_ALL });
-h.get('swipe').set({ direction: Hammer.DIRECTION_VERTICAL });
-
-h.on('panleft panright tap press', function(ev) {
-
-});
-
-/*
 var sizeX = 100;
 var sizeY = 100;
 
@@ -326,6 +314,21 @@ var mouseY;
 
 var lastX;
 var lastY;
+
+var mc = new Hammer.Manager($('#canvas')[0]);
+
+mc.add(new Hammer.Tap());
+
+mc.on('tap', function(ev) {
+	var offset = $('#canvas').offset();
+	var width = $('#canvas').width();
+	var height = $('#canvas').height();
+	mouseX = Math.floor((ev.center.x - offset.left)*100/width);
+	mouseY = Math.floor((ev.center.y - offset.top)*100/height);
+	postPixel(_color_selected,mouseX,mouseY);
+});
+
+/*
 
 
 $(document).mousemove(event => {
@@ -366,4 +369,25 @@ function itorgb(color) {
 		+ palette.green[(color & 0b00011100) >> 2] + ','
 		+ palette.blue[(color & 0b00000011)] + ','
 		+ '1)'
+}
+
+
+function postPixel(color,x,y) {
+	$.ajax({
+		url: '/pixel',
+		headers: {
+			"Authorization": "Bearer " + localStorage.getItem('access_token')
+		},
+		//dataType: 'json',
+		type: 'POST',
+		contentType: "application/json; charset=utf-8",
+		success: function(response){
+			savedcolor = color;
+			//console.log(response);
+		},
+		error: function(error){
+			//console.log(error);
+		},
+		data: JSON.stringify({coord:{x:x,y:y},color: color})
+	});
 }
