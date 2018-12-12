@@ -11,10 +11,11 @@ var AppController = /** @class */ (function () {
       this.$mdDialog = $mdDialog;
       this.$mdMedia = $mdMedia;
       this.$mdToast = $mdToast;
+      this.buttonShow = false;
       this.status = '';
       this.customFullscreen = this.$mdMedia('xs') || this.$mdMedia('sm');
   }
-  AppController.prototype.showDialog = function (event) {
+  AppController.prototype.showLoginDialog = function (event) {
       var _this = this;
       var useFullScreen = (this.$mdMedia('sm') || this.$mdMedia('xs')) && this.customFullscreen;
       this.$mdDialog.show({
@@ -27,6 +28,21 @@ var AppController = /** @class */ (function () {
           fullscreen: useFullScreen
       })
           .then(function (credentials) { return _this.showToast("Thanks for logging in, " + credentials.username + "."); }, function () { return _this.showToast('You canceled the login.'); });
+      this.$scope.$watch(function () { return _this.$mdMedia('xs') || _this.$mdMedia('sm'); }, function (wantsFullScreen) { return _this.customFullscreen = wantsFullScreen === true; });
+  };
+  AppController.prototype.showRegisterDialog = function (event) {
+      var _this = this;
+      var useFullScreen = (this.$mdMedia('sm') || this.$mdMedia('xs')) && this.customFullscreen;
+      this.$mdDialog.show({
+          controller: RegisterDialogController,
+          controllerAs: 'registerDialog',
+          templateUrl: 'register-dialog.template.html',
+          parent: angular.element(document.body),
+          targetEvent: event,
+          clickOutsideToClose: true,
+          fullscreen: useFullScreen
+      })
+          .then(function (credentials) { return _this.showToast("Thanks for registering, " + credentials.username + "."); }, function () { return _this.showToast('You canceled the registration.'); });
       this.$scope.$watch(function () { return _this.$mdMedia('xs') || _this.$mdMedia('sm'); }, function (wantsFullScreen) { return _this.customFullscreen = wantsFullScreen === true; });
   };
   AppController.prototype.showToast = function (content) {
@@ -50,8 +66,31 @@ var LoginDialogController = /** @class */ (function () {
   LoginDialogController.prototype.login = function () {
       this.$mdDialog.hide({username: this.username, password: this.password});
       Login(this.username, this.password);
+      // console.log(bool);
+      console.log(loggedIn);
+      this.buttonShow = loggedIn;
   };
   return LoginDialogController;
+}());
+var RegisterDialogController = /** @class */ (function () {
+  function RegisterDialogController($mdDialog) {
+      this.$mdDialog = $mdDialog;
+  }
+  RegisterDialogController.prototype.hide = function () {
+      this.$mdDialog.hide();
+  };
+  RegisterDialogController.prototype.close = function () {
+      this.$mdDialog.cancel();
+  };
+  RegisterDialogController.prototype.register = function () {
+      this.$mdDialog.hide({username: this.username, password: this.password});
+      Register(this.username, this.password);
+      // console.log(bool);
+      console.log(loggedIn);
+      this.buttonShow = loggedIn;
+
+  };
+  return RegisterDialogController;
 }());
 function config($mdThemingProvider) {
   $mdThemingProvider.theme('default')
