@@ -1,7 +1,3 @@
-burl = document.baseURI
-
-
-
 /* user auth stuff
 */
 
@@ -182,7 +178,7 @@ function loggedOut() {
 
 $(function() {
 	user = localStorage.getItem('user');
-	if (user) {
+	if (user !== null) {
 		loggedIn(user);
 	}
 });
@@ -256,7 +252,7 @@ const socket = io('/pixel');
 
 
 socket.on('post', function(data) {
-	draw(data.color, data.coord.x, data.coord.y);
+	draw(data.color, data.coord);
 });
 
 
@@ -307,26 +303,34 @@ $(function() {
 
 /* canvas interactions
 */
-var sizeX = 100;
-var sizeY = 100;
+var size = {x: 100, y: 100}
 
-var mouseX;
-var mouseY;
+var mousePos
 
-var lastX;
-var lastY;
+var displacement = {
+	x: 0,
+	y: 0
+};
 
 var mc = new Hammer.Manager($('#canvas')[0]);
 
+mc.add(new Hammer.Pan());
 mc.add(new Hammer.Tap());
 
+mc.on('panend', function(ev) {
+	displacement = {x: ev.deltaX + displacement.x, y: ev.deltaY + displacement.y};
+});
+
+mc.on('panmove', function(ev) {
+	x = ev.deltaX + displacement.x;
+	y = ev.deltaY + displacement.y;
+	ev.target.style.transform = "translate(" + x + "px," + y + "px)";
+})
+
 mc.on('tap', function(ev) {
-	var offset = $('#canvas').offset();
-	var width = $('#canvas').width();
-	var height = $('#canvas').height();
-	mouseX = Math.floor((ev.center.x - offset.left)*100/width);
-	mouseY = Math.floor((ev.center.y - offset.top)*100/height);
-	postPixel(_color_selected,mouseX,mouseY);
+	canvas = ev.target;
+	var mousePos = offsetPos(ev.center);
+	postPixel(_color_selected, mousePos);
 });
 
 /*
@@ -357,10 +361,24 @@ $('#canvas').mousedown(event => {
 */
 
 
-function draw(color,x,y) {
+function offsetPos(pos) {
+	var canvas = $('#canvas')[0];
+	var offset = {
+		x: canvas.offsetLeft + displacement.x,
+		y: canvas.offsetTop + displacement.y
+	}
+	var width = $('#canvas').width();
+	var height = $('#canvas').height();
+	return {
+		y: Math.floor((pos.y - offset.y)*size.y/height),
+		x: Math.floor((pos.x - offset.x)*size.x/width)
+	}
+}
+
+function draw(color,pos) {
 	ctx = $('#canvas')[0].getContext('2d');
 	ctx.fillStyle = itorgb(color);
-	ctx.fillRect(x,y,1,1);
+	ctx.fillRect(pos.x,pos.y,1,1);
 }
 
 
@@ -373,7 +391,7 @@ function itorgb(color) {
 }
 
 
-function postPixel(color,x,y) {
+function postPixel(color,pos) {
 	$.ajax({
 		url: '/pixel',
 		headers: {
@@ -389,6 +407,6 @@ function postPixel(color,x,y) {
 		error: function(error){
 			//console.log(error);
 		},
-		data: JSON.stringify({coord:{x:x,y:y},color: color})
+		data: JSON.stringify({coord: pos, color: color})
 	});
 }
