@@ -307,6 +307,8 @@ var size = {x: 100, y: 100}
 
 var mousePos
 
+var zoom = 1;
+
 var displacement = {
 	x: 0,
 	y: 0
@@ -316,6 +318,7 @@ var mc = new Hammer.Manager($('#canvas')[0]);
 
 mc.add(new Hammer.Pan());
 mc.add(new Hammer.Tap());
+mc.add(new Hammer.Pinch());
 
 mc.on('panend', function(ev) {
 	displacement = {x: ev.deltaX + displacement.x, y: ev.deltaY + displacement.y};
@@ -324,13 +327,47 @@ mc.on('panend', function(ev) {
 mc.on('panmove', function(ev) {
 	x = ev.deltaX + displacement.x;
 	y = ev.deltaY + displacement.y;
-	ev.target.style.transform = "translate(" + x + "px," + y + "px)";
+	ev.target.style.transform = "translate(" + x + "px," + y + "px) scale(" + zoom + "," + zoom + ")";
 })
 
 mc.on('tap', function(ev) {
 	canvas = ev.target;
 	var mousePos = offsetPos(ev.center);
 	postPixel(_color_selected, mousePos);
+});
+
+mc.on('pinch', function(ev) {
+	zoom = zoom * ev.scale;
+	if(zoom < 1){
+		zoom = 1;
+	}
+	if(zoom > 16){
+		zoom = 16;
+	}
+	var newCenter = offsetPos(ev.center);
+	x = displacement.x + newCenter.x;
+	y = displacement.y + newCenter.y;
+	ev.target.style.transform = "translate(" + x + "px," + y + "px) scale(" + zoom + "," + zoom + ")";
+	
+	displacement = {x: displacement.x + newCenter.x, y: displacement.y + newCenter.y};
+});
+
+addEventListener("wheel",function(event){
+	console.log("test");
+	var dir = Math.sign(event.wheelDelta);
+	zoom = zoom * dir;
+	if(zoom < 1){
+	zoom = 1;
+	}
+	if(zoom > 16){
+		zoom = 16;
+	}
+	var newCenter = offsetPos(ev.center);
+	x = displacement.x + newCenter.x;
+	y = displacement.y + newCenter.y;
+	ev.target.style.transform = "translate(" + x + "px," + y + "px) scale(" + zoom + "," + zoom + ")";
+		
+	displacement = {x: displacement.x + newCenter.x, y: displacement.y + newCenter.y};
 });
 
 /*
