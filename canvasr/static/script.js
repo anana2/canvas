@@ -76,73 +76,158 @@ $('#login_form').submit(function(ev) {
 });
 
 
-function register(user, pasw) {
-	$.ajax('/register', {
-		type: 'POST',
-		contentType: 'application/json; charset=utf-8',
-		dataType: 'json',
-		data: JSON.stringify({
-			user: user,
-			pasw: pasw
-		}),
-		success: function(data, status, xhr){
-			localStorage.setItem('user', user);
-			localStorage.setItem('access_token', data['access_token']);
-			$.notify({
-				message: 'registration successful'
-			},{
-				allow_dismiss: false,
-				element: '#canvas_container',
-				type: 'success',
-				placement: {
-					from: "bottom",
-					align: "center"
-				},
-				offset: {
-					y: 32
-				},
-				delay: 800,
-				animate: {
-					enter: 'animated fadeIn',
-					exit: 'animated fadeOut'
-				},
-				template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
-					'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"><span aria-hidden="true">&times;</span></button>' +
-					'<div style="text-align: center;">' +
-						'<span data-notify="message">{2}</span>' +
-					'</div>' +
-				'</div>'
-			});
-			loggedIn(user)
-		},
-		error: function() {
-			$.notify({
-				message: 'user already exists'
-			},{
-				allow_dismiss: false,
-				element: '#canvas_container',
-				type: 'warning',
-				placement: {
-					from: "bottom",
-					align: "center"
-				},
-				offset: {
-					y: 32
-				},
-				delay: 800,
-				animate: {
-					enter: 'animated fadeIn',
-					exit: 'animated fadeOut'
-				},
-				template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
-					'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"><span aria-hidden="true">&times;</span></button>' +
-					'<div style="text-align: center;">' +
-						'<span data-notify="message">{2}</span>' +
-					'</div>' +
-				'</div>'
-			});
-		}
-	});
+function register(user, pasw, conf) {
+	// console.log(user);
+	// console.log(pasw);
+	if(user == null || user.length < 5 || user.length >= 64){
+		$.notify({
+			message: 'Username must be at least 5 characters (and under 64 characters) long'
+		},{
+			allow_dismiss: false,
+			element: '#canvas_container',
+			type: 'warning',
+			placement: {
+				from: "bottom",
+				align: "center"
+			},
+			offset: {
+				y: 32
+			},
+			delay: 800,
+			animate: {
+				enter: 'animated fadeIn',
+				exit: 'animated fadeOut'
+			},
+			template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+				'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"><span aria-hidden="true">&times;</span></button>' +
+				'<div style="text-align: center;">' +
+					'<span data-notify="message">{2}</span>' +
+				'</div>' +
+			'</div>'
+		});
+	}
+	else if(pasw == null || pasw.length < 8 || pasw.length >= 64){
+		$.notify({
+			message: 'Password must be at least 8 characters (and under 64 characters) long'
+		},{
+			allow_dismiss: false,
+			element: '#canvas_container',
+			type: 'warning',
+			placement: {
+				from: "bottom",
+				align: "center"
+			},
+			offset: {
+				y: 32
+			},
+			delay: 800,
+			animate: {
+				enter: 'animated fadeIn',
+				exit: 'animated fadeOut'
+			},
+			template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+				'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"><span aria-hidden="true">&times;</span></button>' +
+				'<div style="text-align: center;">' +
+					'<span data-notify="message">{2}</span>' +
+				'</div>' +
+			'</div>'
+		});
+	}
+	else if(pasw != conf){
+		$.notify({
+			message: 'Password and Confirm Password fields need to match'
+		},{
+			allow_dismiss: false,
+			element: '#canvas_container',
+			type: 'warning',
+			placement: {
+				from: "bottom",
+				align: "center"
+			},
+			offset: {
+				y: 32
+			},
+			delay: 800,
+			animate: {
+				enter: 'animated fadeIn',
+				exit: 'animated fadeOut'
+			},
+			template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+				'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"><span aria-hidden="true">&times;</span></button>' +
+				'<div style="text-align: center;">' +
+					'<span data-notify="message">{2}</span>' +
+				'</div>' +
+			'</div>'
+		});
+	}
+	else{
+		$.ajax('/register', {
+			type: 'POST',
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			data: JSON.stringify({
+				user: user,
+				pasw: pasw
+			}),
+			success: function(data, status, xhr){
+				localStorage.setItem('user', user);
+				localStorage.setItem('access_token', data['access_token']);
+				$.notify({
+					message: 'Registration successful!'
+				},{
+					allow_dismiss: false,
+					element: '#canvas_container',
+					type: 'success',
+					placement: {
+						from: "bottom",
+						align: "center"
+					},
+					offset: {
+						y: 32
+					},
+					delay: 800,
+					animate: {
+						enter: 'animated fadeIn',
+						exit: 'animated fadeOut'
+					},
+					template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+						'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"><span aria-hidden="true">&times;</span></button>' +
+						'<div style="text-align: center;">' +
+							'<span data-notify="message">{2}</span>' +
+						'</div>' +
+					'</div>'
+				});
+				loggedIn(user)
+			},
+			error: function() {
+				$.notify({
+					message: 'Sorry, that username is already taken'
+				},{
+					allow_dismiss: false,
+					element: '#canvas_container',
+					type: 'warning',
+					placement: {
+						from: "bottom",
+						align: "center"
+					},
+					offset: {
+						y: 32
+					},
+					delay: 800,
+					animate: {
+						enter: 'animated fadeIn',
+						exit: 'animated fadeOut'
+					},
+					template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+						'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"><span aria-hidden="true">&times;</span></button>' +
+						'<div style="text-align: center;">' +
+							'<span data-notify="message">{2}</span>' +
+						'</div>' +
+					'</div>'
+				});
+			}
+		});
+	}
 }
 
 
@@ -150,8 +235,9 @@ $('#register_form').submit(function(ev) {
 	ev.preventDefault();
 	user = $('#register_user').val();
 	pasw = $('#register_pasw').val();
+	conf = $('#register_conf').val();
 	$('#registration').modal('hide');
-	register(user, pasw);
+	register(user, pasw, conf);
 })
 
 
