@@ -66,7 +66,9 @@ def register():
     if len(user) > 64:
         return jsonify(msg='username too long'), 400
     if len(pasw) > 64:
-        return jsonify(msg='password too long'), 400
+        return jsonify(msg='password too long, max 64'), 400
+    if len(pasw) < 8:
+        return jsonify(msg='password too short, min 8'), 400
 
     hash = ph.hash(pasw)
 
