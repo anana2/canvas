@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, current_app as app
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
 from argon2 import PasswordHasher
 
@@ -43,7 +43,7 @@ def login():
         hash = ph.hash(pasw)
         store.set(f'hash:{user}', hash)
 
-    return jsonify(access_token=create_access_token(user)), 200
+    return jsonify(cooldown=app.config['CD_TIME'], access_token=create_access_token(user)), 200
 
 
 @bp.route('/register', methods=['POST'])
@@ -63,9 +63,14 @@ def register():
 
     pasw = data['pasw']
 
+    if len(user) > 64:
+        return jsonify(msg='username too long'), 400
+    if len(pasw) > 64:
+        return jsonify(msg='password too long'), 400
+
     hash = ph.hash(pasw)
 
     store.set(f'hash:{user}', hash)
 
-    return jsonify(access_token=create_access_token(user)), 200
+    return jsonify(cooldown=app.config['CD_TIME'], access_token=create_access_token(user)), 200
 
