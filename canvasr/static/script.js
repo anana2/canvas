@@ -208,32 +208,24 @@ var palette = {
 //initialize board colors and stuff
 $(function() {
 	$.ajax('/board', {
-		accepts: {
-			xrgb8: 'application/x-rgb8'
-		},
-		converters: {
-			'text xrgb8': function(data) {
-				data = atob(data);
-				l = data.length;
-				var buf = new ArrayBuffer(l*4);
-				var view = new Uint8ClampedArray(buf);
-				var j = 0;
-				for (var i = 0; i < l; i++) {
-					d = data.charCodeAt(i);
-					view[j++] = palette.red[(d & 0b11100000) >> 5];
-					view[j++] = palette.green[(d & 0b00011100) >> 2];
-					view[j++] = palette.blue[(d & 0b00000011)];
-					view[j++] = 255;
-				}
-				return buf
-			}
-		},
 		type: 'GET',
-		dataType: 'xrgb8',
+		dataType: 'json',
 		success: function(data, status, xhr){
+			data = atob(data['board']);
+			l = data.length;
+			var buf = new ArrayBuffer(l*4);
+			var view = new Uint8ClampedArray(buf);
+			var j = 0;
+			for (var i = 0; i < l; i++) {
+				d = data.charCodeAt(i);
+				view[j++] = palette.red[(d & 0b11100000) >> 5];
+				view[j++] = palette.green[(d & 0b00011100) >> 2];
+				view[j++] = palette.blue[(d & 0b00000011)];
+				view[j++] = 255;
+			}
 			const ctx = $('#canvas')[0].getContext('2d');
 			const image = ctx.createImageData(ctx.canvas.width,ctx.canvas.height);
-			image.data.set(new Uint8ClampedArray(data));
+			image.data.set(view);
 			ctx.putImageData(image,0,0);
 		}
 	});
