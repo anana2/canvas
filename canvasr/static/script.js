@@ -350,7 +350,7 @@ mc.on('panstart', function(ev) {
 });
 
 mc.on('panmove', function(ev) {
-	transform.x = x = ev.deltaX + displacement.x;
+	transform.x = ev.deltaX + displacement.x;
 	transform.y = ev.deltaY + displacement.y;
 	updateTransform(ev.target);
 });
@@ -408,10 +408,12 @@ mc.on('pinchend', function(ev) {
 	if(displacement.z > 4){
 		displacement.z = 4;
 	}
+	displacement.x = transform.x;
+	displacement.y = transform.y;
 })
 
 
-$(document).on("mousewheel",function(ev){
+$('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
 	if (ev.originalEvent.wheelDelta > 0) {
 		displacement.z += 0.1;
 	}
@@ -427,14 +429,14 @@ $(document).on("mousewheel",function(ev){
 	}
 	else {
 		var offset = {
-			x: (canvas.offsetLeft + displacement.x - ev.clientX),
-			y: (canvas.offsetTop + displacement.y - ev.clientY)
+			x: (canvas.offsetLeft - ev.clientX),
+			y: (canvas.offsetTop - ev.clientY)
 		}
 		transform.x = displacement.x + offset.x * displacement.z - offset.x;
 		transform.y = displacement.y + offset.y * displacement.z - offset.y;
 		transform.z = displacement.z;
-		console.log(transform)
 		updateTransform(event.target);
+
 	}
 });
 
