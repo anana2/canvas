@@ -297,29 +297,62 @@ $(function() {
 */
 var size = {x: 100, y: 100}
 
-var mousePos
+var mousePos = {
+	x: 0,
+	y: 0
+}
 
 var zoom = 1;
 
 var displacement = {
 	x: 0,
-	y: 0
+	y: 0,
+	z: 1
 };
 
-var mc = new Hammer.Manager($('#canvas')[0]);
+var transform = {
+	x: 0,
+	y: 0,
+	z: 1,
+	updating: false
+}
 
-mc.add(new Hammer.Pan());
-mc.add(new Hammer.Tap());
-mc.add(new Hammer.Pinch());
-
-mc.on('panend', function(ev) {
-	displacement = {x: ev.deltaX + displacement.x, y: ev.deltaY + displacement.y};
+var mc = new Hammer.Manager($('#canvas')[0], {
+	recognizers: [
+		[Hammer.Pan],
+		[Hammer.Pinch, {enable: true}],
+		[Hammer.Tap, {enable: true}]
+	]
 });
 
-mc.on('panmove', function(ev) {
-	x = ev.deltaX + displacement.x;
-	y = ev.deltaY + displacement.y;
-	ev.target.style.transform = "translate(" + x + "px," + y + "px) scale(" + zoom + "," + zoom + ")";
+var reqAnimationFrame = (function () {
+	return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function (callback) {
+		window.setTimeout(callback, 1000/144);
+	};
+})();
+
+var updateTransform = function(el) {
+	if (!transform.updating) {
+		transform.updating = true;
+		reqAnimationFrame(function() {
+			el.style.transform =
+				"translate(" + transform.x + "px," + transform.y + "px)" +
+				" " +
+				"scale(" + transform.z + "," + transform.z + ")";
+			transform.updating = false;
+		});
+	}
+}
+
+mc.on('pan', function(ev) {
+	transform.x = x = ev.deltaX + displacement.x;
+	transform.y = ev.deltaY + displacement.y;
+	updateTransform(ev.target);
+
+	if (ev.isFinal) {
+		displacement.x = transform.x;
+		displacement.y = transform.y;
+	}
 })
 
 mc.on('tap', function(ev) {
@@ -328,22 +361,28 @@ mc.on('tap', function(ev) {
 	postPixel(_color_selected, mousePos);
 });
 
-mc.on('pinch', function(ev) {
-	zoom = zoom * ev.scale;
-	if(zoom < 1){
-		zoom = 1;
+mc.on('pinchmove', function(ev) {
+	transform.z = displacement.z * ev.scale;
+	if(transform.z < 1){
+		transform.z = 1;
 	}
-	if(zoom > 16){
-		zoom = 16;
+	if(transform.z > 16){
+		transform.z = 16;
 	}
-	var newCenter = offsetPos(ev.center);
-	x = displacement.x + newCenter.x;
-	y = displacement.y + newCenter.y;
-	ev.target.style.transform = "translate(" + x + "px," + y + "px) scale(" + zoom + "," + zoom + ")";
-	
-	displacement = {x: displacement.x + newCenter.x, y: displacement.y + newCenter.y};
+	updateTransform(ev.target);
 });
 
+mc.on('pinchend', function(ev) {
+	displacement.z = displacement.z * ev.scale;
+	if(displacement.z < 1){
+		displacement.z = 1;
+	}
+	if(displacement.z > 16){
+		displacement.z
+	}
+})
+
+/*
 addEventListener("wheel",function(event){
 	console.log("test");
 	var dir = Math.sign(event.wheelDelta);
@@ -361,6 +400,7 @@ addEventListener("wheel",function(event){
 		
 	displacement = {x: displacement.x + newCenter.x, y: displacement.y + newCenter.y};
 });
+*/
 
 /*
 
@@ -392,15 +432,15 @@ $('#canvas').mousedown(event => {
 
 function offsetPos(pos) {
 	var canvas = $('#canvas')[0];
-	var offset = {
-		x: canvas.offsetLeft + displacement.x,
-		y: canvas.offsetTop + displacement.y
-	}
 	var width = $('#canvas').width();
 	var height = $('#canvas').height();
+	var offset = {
+		x: (canvas.offsetLeft + displacement.x - width/2) + width/2,
+		y: (canvas.offsetTop + displacement.y - height/2) + height/2
+	}
 	return {
-		y: Math.floor((pos.y - offset.y)*size.y/height),
-		x: Math.floor((pos.x - offset.x)*size.x/width)
+		y: Math.floor(((pos.y/height - offset.y/height - 1/2) / displacement.z + 1/2) * size.y),
+		x: Math.floor(((pos.x/width - offset.x/width - 1/2) / displacement.z + 1/2 ) * size.x)
 	}
 }
 
