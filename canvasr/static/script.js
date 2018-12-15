@@ -412,7 +412,7 @@ mc.on('pinchend', function(ev) {
 	displacement.y = transform.y;
 })
 
-
+/*
 $('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
 	if (ev.originalEvent.wheelDelta > 0) {
 		displacement.z += 0.1;
@@ -438,7 +438,7 @@ $('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
 		updateTransform(event.target);
 
 	}
-});
+});*/
 
 
 /*
@@ -470,6 +470,7 @@ $('#canvas').mousedown(event => {
 
 
 function offsetPos(pos) {
+	displacement = transform
 	var canvas = $('#canvas')[0];
 	var width = $('#canvas').width();
 	var height = $('#canvas').height();

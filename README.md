@@ -36,11 +36,13 @@ start redis
 redis-server
 ```
 
-starting the server
+starting the debug server
 
 ``` bash
-pipenv run flask run
+pipenv run flask run --host=0.0.0.0
 ```
+
+You can now visit the website at [http://0.0.0.0:5000/](http://0.0.0.0:5000/)
 
 ## SocketIO test client
 
