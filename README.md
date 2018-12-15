@@ -8,6 +8,10 @@
 
 [pipenv](https://pipenv.readthedocs.io/en/latest/install) `pip install --user pipenv`
 
+redis >= 3.2.0 (the installation is dependant of your os and distribution)
+
+- on MacOS: `brew install redis`
+
 ## Quickstart
 
 install the project package with `pipenv install --dev`
@@ -21,12 +25,20 @@ setting up your envs:
 ```bash
 echo FLASK_APP=canvasr >> .env
 echo FLASK_ENV=development >> .env
+echo JWT_SECRET_KEY=secret >> .env
+echo CD_TIME=1 >> .env
+```
+
+start redis
+
+```bash
+redis-server
 ```
 
 starting the server
 
 ``` bash
-pipenv run backend
+pipenv run flask run
 ```
 
 ## SocketIO test client
