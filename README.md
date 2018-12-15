@@ -8,7 +8,8 @@
 
 [pipenv](https://pipenv.readthedocs.io/en/latest/install) `pip install --user pipenv`
 
-redis >= 3.2.0 (the installation is dependant of your os and distribution)
+redis >= 3.2.0 (the installation is dependant of your os and distribution). If you can't install a redis
+instance locally, use the live server.
 
 - on MacOS: `brew install redis`
 
@@ -16,7 +17,7 @@ redis >= 3.2.0 (the installation is dependant of your os and distribution)
 
 install the project package with `pipenv install --dev`
 
-create a new branch before doing commiting any changes!
+create a new branch before commiting any changes!
 
 ## Running the Debug Server
 
