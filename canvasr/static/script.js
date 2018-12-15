@@ -317,13 +317,13 @@ var transform = {
 	updating: false
 }
 
-var mc = new Hammer.Manager($('#canvas')[0], {
-	recognizers: [
-		[Hammer.Pan],
-		[Hammer.Pinch, {enable: true}],
-		[Hammer.Tap, {enable: true}]
-	]
-});
+var mc = new Hammer.Manager($('#canvas')[0]);
+
+mc.add(new Hammer.Pinch());
+mc.add(new Hammer.Pan());
+mc.add(new Hammer.Tap({taps: 2, event: 'doubletap'}));
+mc.add(new Hammer.Tap({event: 'singletap'})).requireFailure('doubletap');
+mc.get('doubletap').recognizeWith('singletap');
 
 var reqAnimationFrame = (function () {
 	return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function (callback) {
@@ -344,32 +344,60 @@ var updateTransform = function(el) {
 	}
 }
 
-mc.on('pan', function(ev) {
+mc.on('panstart', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+});
+
+mc.on('panmove', function(ev) {
 	transform.x = x = ev.deltaX + displacement.x;
 	transform.y = ev.deltaY + displacement.y;
 	updateTransform(ev.target);
+});
 
-	if (ev.isFinal) {
-		displacement.x = transform.x;
-		displacement.y = transform.y;
-	}
-})
+mc.on('panend', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+});
 
-mc.on('tap', function(ev) {
+mc.on('singletap', function(ev) {
 	canvas = ev.target;
 	var mousePos = offsetPos(ev.center);
 	postPixel(_color_selected, mousePos);
 });
 
+mc.on('doubletap', function(ev) {
+	transform = {
+		x:0,y:0,z:1
+	}
+	updateTransform(ev.target);
+})
+
+mc.on('pinchstart', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+})
 mc.on('pinchmove', function(ev) {
+	$canvas = $('#canvas');
+	w = $canvas.width();
+	h = $canvas.height();
+
 	transform.z = displacement.z * ev.scale;
 	if(transform.z < 1){
 		transform.z = 1;
 	}
-	if(transform.z > 16){
-		transform.z = 16;
+	else if(transform.z > 4){
+		transform.z = 4;
 	}
-	updateTransform(ev.target);
+	else {
+		var offset = {
+			x: (canvas.offsetLeft + displacement.x - ev.center.x),
+			y: (canvas.offsetTop + displacement.y - ev.center.y)
+		}
+		transform.x = ev.deltaX + displacement.x + offset.x * ev.scale - offset.x
+		transform.y = ev.deltaY + displacement.y + offset.y * ev.scale - offset.y
+		updateTransform(ev.target);
+	}
 });
 
 mc.on('pinchend', function(ev) {
@@ -377,30 +405,39 @@ mc.on('pinchend', function(ev) {
 	if(displacement.z < 1){
 		displacement.z = 1;
 	}
-	if(displacement.z > 16){
-		displacement.z
+	if(displacement.z > 4){
+		displacement.z = 4;
 	}
 })
 
-/*
-addEventListener("wheel",function(event){
-	console.log("test");
-	var dir = Math.sign(event.wheelDelta);
-	zoom = zoom * dir;
-	if(zoom < 1){
-	zoom = 1;
+
+$(document).on("mousewheel",function(ev){
+	if (ev.originalEvent.wheelDelta > 0) {
+		displacement.z += 0.1;
 	}
-	if(zoom > 16){
-		zoom = 16;
+	else {
+		displacement.z -= 0.1
 	}
-	var newCenter = offsetPos(ev.center);
-	x = displacement.x + newCenter.x;
-	y = displacement.y + newCenter.y;
-	ev.target.style.transform = "translate(" + x + "px," + y + "px) scale(" + zoom + "," + zoom + ")";
-		
-	displacement = {x: displacement.x + newCenter.x, y: displacement.y + newCenter.y};
+
+	if(displacement.z < 1){
+		displacement.z = 1;
+	}
+	else if(displacement.z > 4){
+		displacement.z = 4;
+	}
+	else {
+		var offset = {
+			x: (canvas.offsetLeft + displacement.x - ev.clientX),
+			y: (canvas.offsetTop + displacement.y - ev.clientY)
+		}
+		transform.x = displacement.x + offset.x * displacement.z - offset.x;
+		transform.y = displacement.y + offset.y * displacement.z - offset.y;
+		transform.z = displacement.z;
+		console.log(transform)
+		updateTransform(event.target);
+	}
 });
-*/
+
 
 /*
 
@@ -435,12 +472,12 @@ function offsetPos(pos) {
 	var width = $('#canvas').width();
 	var height = $('#canvas').height();
 	var offset = {
-		x: (canvas.offsetLeft + displacement.x - width/2) + width/2,
-		y: (canvas.offsetTop + displacement.y - height/2) + height/2
+		x: (canvas.offsetLeft + displacement.x),
+		y: (canvas.offsetTop + displacement.y)
 	}
 	return {
-		y: Math.floor(((pos.y/height - offset.y/height - 1/2) / displacement.z + 1/2) * size.y),
-		x: Math.floor(((pos.x/width - offset.x/width - 1/2) / displacement.z + 1/2 ) * size.x)
+		y: Math.floor((pos.y - offset.y) * size.y / height/displacement.z),
+		x: Math.floor((pos.x - offset.x) * size.x / width/displacement.z)
 	}
 }
 
