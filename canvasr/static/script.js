@@ -297,33 +297,147 @@ $(function() {
 */
 var size = {x: 100, y: 100}
 
-var mousePos
+var mousePos = {
+	x: 0,
+	y: 0
+}
+
+var zoom = 1;
 
 var displacement = {
 	x: 0,
-	y: 0
+	y: 0,
+	z: 1
 };
+
+var transform = {
+	x: 0,
+	y: 0,
+	z: 1,
+	updating: false
+}
 
 var mc = new Hammer.Manager($('#canvas')[0]);
 
+mc.add(new Hammer.Pinch());
 mc.add(new Hammer.Pan());
-mc.add(new Hammer.Tap());
+mc.add(new Hammer.Tap({taps: 2, event: 'doubletap'}));
+mc.add(new Hammer.Tap({event: 'singletap'})).requireFailure('doubletap');
+mc.get('doubletap').recognizeWith('singletap');
 
-mc.on('panend', function(ev) {
-	displacement = {x: ev.deltaX + displacement.x, y: ev.deltaY + displacement.y};
+var reqAnimationFrame = (function () {
+	return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function (callback) {
+		window.setTimeout(callback, 1000/144);
+	};
+})();
+
+var updateTransform = function(el) {
+	if (!transform.updating) {
+		transform.updating = true;
+		reqAnimationFrame(function() {
+			el.style.transform =
+				"translate(" + transform.x + "px," + transform.y + "px)" +
+				" " +
+				"scale(" + transform.z + "," + transform.z + ")";
+			transform.updating = false;
+		});
+	}
+}
+
+mc.on('panstart', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
 });
 
 mc.on('panmove', function(ev) {
-	x = ev.deltaX + displacement.x;
-	y = ev.deltaY + displacement.y;
-	ev.target.style.transform = "translate(" + x + "px," + y + "px)";
-})
+	transform.x = x = ev.deltaX + displacement.x;
+	transform.y = ev.deltaY + displacement.y;
+	updateTransform(ev.target);
+});
 
-mc.on('tap', function(ev) {
+mc.on('panend', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+});
+
+mc.on('singletap', function(ev) {
 	canvas = ev.target;
 	var mousePos = offsetPos(ev.center);
 	postPixel(_color_selected, mousePos);
 });
+
+mc.on('doubletap', function(ev) {
+	transform = {
+		x:0,y:0,z:1
+	}
+	updateTransform(ev.target);
+})
+
+mc.on('pinchstart', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+})
+mc.on('pinchmove', function(ev) {
+	$canvas = $('#canvas');
+	w = $canvas.width();
+	h = $canvas.height();
+
+	transform.z = displacement.z * ev.scale;
+	if(transform.z < 1){
+		transform.z = 1;
+	}
+	else if(transform.z > 4){
+		transform.z = 4;
+	}
+	else {
+		var offset = {
+			x: (canvas.offsetLeft + displacement.x - ev.center.x),
+			y: (canvas.offsetTop + displacement.y - ev.center.y)
+		}
+		transform.x = ev.deltaX + displacement.x + offset.x * ev.scale - offset.x
+		transform.y = ev.deltaY + displacement.y + offset.y * ev.scale - offset.y
+		updateTransform(ev.target);
+	}
+});
+
+mc.on('pinchend', function(ev) {
+	displacement.z = displacement.z * ev.scale;
+	if(displacement.z < 1){
+		displacement.z = 1;
+	}
+	if(displacement.z > 4){
+		displacement.z = 4;
+	}
+})
+
+
+$(document).on("mousewheel",function(ev){
+	if (ev.originalEvent.wheelDelta > 0) {
+		displacement.z += 0.1;
+	}
+	else {
+		displacement.z -= 0.1
+	}
+
+	if(displacement.z < 1){
+		displacement.z = 1;
+	}
+	else if(displacement.z > 4){
+		displacement.z = 4;
+	}
+	else {
+		var offset = {
+			x: (canvas.offsetLeft + displacement.x - ev.clientX),
+			y: (canvas.offsetTop + displacement.y - ev.clientY)
+		}
+		transform.x = displacement.x + offset.x * displacement.z - offset.x;
+		transform.y = displacement.y + offset.y * displacement.z - offset.y;
+		transform.z = displacement.z;
+		console.log(transform)
+		updateTransform(event.target);
+	}
+});
+
 
 /*
 
@@ -355,15 +469,15 @@ $('#canvas').mousedown(event => {
 
 function offsetPos(pos) {
 	var canvas = $('#canvas')[0];
-	var offset = {
-		x: canvas.offsetLeft + displacement.x,
-		y: canvas.offsetTop + displacement.y
-	}
 	var width = $('#canvas').width();
 	var height = $('#canvas').height();
+	var offset = {
+		x: (canvas.offsetLeft + displacement.x),
+		y: (canvas.offsetTop + displacement.y)
+	}
 	return {
-		y: Math.floor((pos.y - offset.y)*size.y/height),
-		x: Math.floor((pos.x - offset.x)*size.x/width)
+		y: Math.floor((pos.y - offset.y) * size.y / height/displacement.z),
+		x: Math.floor((pos.x - offset.x) * size.x / width/displacement.z)
 	}
 }
 
