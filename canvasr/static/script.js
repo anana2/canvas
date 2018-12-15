@@ -347,6 +347,7 @@ var updateTransform = function(el) {
 mc.on('panstart', function(ev) {
 	displacement.x = transform.x;
 	displacement.y = transform.y;
+	displacement.z = transform.z;
 });
 
 mc.on('panmove', function(ev) {
@@ -358,6 +359,7 @@ mc.on('panmove', function(ev) {
 mc.on('panend', function(ev) {
 	displacement.x = transform.x;
 	displacement.y = transform.y;
+	displacement.z = transform.z;
 });
 
 mc.on('singletap', function(ev) {
@@ -376,6 +378,7 @@ mc.on('doubletap', function(ev) {
 mc.on('pinchstart', function(ev) {
 	displacement.x = transform.x;
 	displacement.y = transform.y;
+	displacement.z = transform.z;
 })
 mc.on('pinchmove', function(ev) {
 	$canvas = $('#canvas');
@@ -416,21 +419,46 @@ mc.on('pinchend', function(ev) {
 $('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
 	console.log(ev.originalEvent.wheelDelta)
 	if (ev.originalEvent.wheelDelta > 0) {
-		displacement.z += 0.1;
+		displacement.z *= 1.1;
+		if(displacement.z < 1){
+			displacement.z = 1;
+		}
+		else if(displacement.z > 4){
+			displacement.z = 4;
+		}
+		else {
+			var offset = {
+				x: -(canvas.offsetLeft + displacement.x - ev.clientX),
+				y: -(canvas.offsetTop + displacement.y - ev.clientY)
+			}
+			displacement.x = displacement.x - (offset.x * 1.1) + offset.x;
+			displacement.y = displacement.y - (offset.y * 1.1) + offset.y;
+			transform.x = displacement.x
+			transform.y = displacement.y
+			transform.z = displacement.z
+			updateTransform(event.target);
+		}
 	}
 	else {
-		displacement.z -= 0.1
-	}
-
-	if(displacement.z < 1){
-		displacement.z = 1;
-	}
-	else if(displacement.z > 4){
-		displacement.z = 4;
-	}
-	else {
-		transform.z = displacement.z
-		updateTransform(event.target);
+		displacement.z /= 1.1
+		if(displacement.z < 1){
+			displacement.z = 1;
+		}
+		else if(displacement.z > 4){
+			displacement.z = 4;
+		}
+		else {
+			var offset = {
+				x: -(canvas.offsetLeft + displacement.x - ev.clientX),
+				y: -(canvas.offsetTop + displacement.y - ev.clientY)
+			}
+			displacement.x = displacement.x - (offset.x / 1.1) + offset.x;
+			displacement.y = displacement.y - (offset.y / 1.1) + offset.y;
+			transform.x = displacement.x
+			transform.y = displacement.y
+			transform.z = displacement.z
+			updateTransform(event.target);
+		}
 	}
 });
 
@@ -464,8 +492,9 @@ $('#canvas').mousedown(event => {
 
 
 function offsetPos(pos) {
-	displacement.x = transform.x
-	displacement.y = transform.y
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+	displacement.z = transform.z;
 	var canvas = $('#canvas')[0];
 	var width = $('#canvas').width();
 	var height = $('#canvas').height();
