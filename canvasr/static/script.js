@@ -412,7 +412,7 @@ mc.on('pinchend', function(ev) {
 	displacement.y = transform.y;
 })
 
-/*
+
 $('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
 	if (ev.originalEvent.wheelDelta > 0) {
 		displacement.z += 0.1;
@@ -436,9 +436,8 @@ $('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
 		transform.y = displacement.y + offset.y * displacement.z - offset.y;
 		transform.z = displacement.z;
 		updateTransform(event.target);
-
 	}
-});*/
+});
 
 
 /*
@@ -470,7 +469,8 @@ $('#canvas').mousedown(event => {
 
 
 function offsetPos(pos) {
-	displacement = transform
+	displacement.x = transform.x
+	displacement.y = transform.y
 	var canvas = $('#canvas')[0];
 	var width = $('#canvas').width();
 	var height = $('#canvas').height();
