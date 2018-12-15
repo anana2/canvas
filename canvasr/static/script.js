@@ -429,14 +429,6 @@ $('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
 		displacement.z = 4;
 	}
 	else {
-		var offset = {
-			x: (canvas.offsetLeft + displacement.x - ev.clientX),
-			y: (canvas.offsetTop + displacement.y - ev.clientY)
-		}
-		displacement.x = displacement.x + offset.x * displacement.z - offset.x;
-		displacement.y = displacement.y + offset.y * displacement.z - offset.y;
-		transform.x = displacement.x
-		transform.y = displacement.y
 		transform.z = displacement.z
 		updateTransform(event.target);
 	}
