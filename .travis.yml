@@ -1,17 +1,17 @@
 services:
-  - redis-server
+- redis-server
 language:
-  - python
+- python
 python:
-  - '3.6'
+- '3.6'
 install:
-  - pip install pipenv
-  - pipenv install --dev
+- pip install pipenv
+- pipenv install --dev
 script:
-  - pipenv run pytest
+- pipenv run pytest
 deploy:
   provider: heroku
   api_key:
-    secure: jn0dw+RcbebQuZc5Le2vQvCKk8uDcvIAbWGp5e/M/XxLz6Bo5/sb2bC1V0bVIPCMqh0S0eEVqN4y9F8dhdOYzeRnm2ebBt1Qmdpz4sZiZRua1HNB9EsiGS1H1c9TNnBjJhIvqzcYhnA207bwzTP67gdNywKarYotzTt1/CbwapRZyhbRzOt9exG4dfOu2JzUHYt/QAwe0+VF2sGRfI94Sx//3kNTWaC4X4kNvNpd9UCXkKtM8CNOPh7hts6VO/QaOiQnVC5pRxIMMuH+RJD+hVAPFDJnKATCpe7GVN2QzuON7wrqQkBIoZ1PFxJJz8cwOdCCjhDhnobFTxZ742s6DrQbyj2XAsc4pxT/A+seUAxgNWFt1+JNXozbnjg7e02aNByT5nLc6tRzCOa1ajTOWwqzr3zH22pdtI3FFJAp9JNlO9coYZoKQwX62gOQgDPKRa50XoAKSzeQhwRbtmLvs029aTUCfS1JL8D1sNmQhbgtY7Smg3hVlvmrGYpmDPKudAgd6HiF8Y+J+aqv4E5k0p7RnLYDZMAtm74EbAP4qIkBSOWT3rtPcVk7bKso6h81RbAu5TZNuhl8SjT+/DC0Wt4nxo1bZnfFfD1jSJNb61aicJzyVv7nJqkQus/g48IvjbeGBxDODuBrMKGdKBcLL+U71qH61WnKh6N11jsmvvo=
+    secure: DKOZJ7kNC6eS2jHzEJoaEfvIsO+pQSL42RCqTwUECkXy44B7tdgkE6Tu7awtX5k+4ediEe/AYdkkHiZquFw1jt+galZSmN7LpEGySNsW0ec6b7tHwfvJEW+zV1b2/RDw1jD/yvBeF9Gc9bpDdY1TjJD4Gt1VDkax3iRmiPJ8WMNo+J27ECY6Brk341JsqBtERZyfI0nn59QpMT81tx3kHPGYtPDtkRW9ltuU5K6TahyszWlRWXjXCb7AWOwPxJBIL95ZXCJnfir8u/XvLnUb2G8j8is96sUAmmKNJNkI2kX2bt32ujqfCYgLM35y1G04ABMGKPTr96JJcJcyzSeZabBrOf95Srdi3GgmBFM0jlEJF/83R6U0yQzea6XfvqTuBwVbn3x/ludt3OFbqmwlo9dwFOLh+zR2Tj2Ixu1zs7jH80YsnApzC+BJRBd/bG9cVaXyGL80U8RG3dnzNItLlEbQpiYcDl6it0+ljg2JGWWzkvSg903vAPvsYhliVy7K7/Ox7Bz19HYckMo35P9N7hB/TpT+mzPUgixd9Y5P0hFmx+yQdbpAorW4WTL9ZQJuhQ88g/kfqcexxJJ4aGnBqM8nonsONWZrE7MnfidasyjdXyDvC4z17hDFgdC46NujQ6MGaTF6qs1ZHmthAXyRSQywJP8Dh4NvBHP1en1Qc48=
   app:
     master: comp307p1-staging
