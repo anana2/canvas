@@ -1,13 +1,15 @@
 import eventlet
 eventlet.monkey_patch()
 
-from flask import Flask, render_template, current_app, g
+from flask import Flask, render_template, current_app, send_from_directory
 from flask_collect import Collect
 from flask_redis import FlaskRedis
 from werkzeug.local import LocalProxy
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
+
+import os
 
 
 store = FlaskRedis()
@@ -45,6 +47,10 @@ def create_app(**kwargs):
     @app.route('/')
     def root():
         return render_template('index.html')
+
+    @app.route('/favicon.ico')
+    def favicon():
+        return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
     @app.route('/greet')
     def greeting():

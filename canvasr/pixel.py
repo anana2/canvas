@@ -44,16 +44,19 @@ def configuration(state):
 def draw():
     data = request.get_json()
 
+    if not data:
+        return jsonify(msg='missing request data, json body not found'), 400
+
     if 'coord' not in data:
-        return 'missing coordinates', 400
+        return jsonify(msg='missing coordinates'), 400
     if 'x' not in data['coord'] or 'y' not in data['coord']:
-        return 'wrong coordinates format', 400
+        return jsonify(msg='wrong coordinates format'), 400
 
     user = get_jwt_identity()
 
     # check cooldown
     if store.get(f"lock:{user}") is not None:
-        return 'in cooldown, draw not available', 403
+        return jsonify(msg='in cooldown, draw not available'), 403
 
     store.setex(f"lock:{user}",CDTIME,'_')
 
@@ -63,6 +66,22 @@ def draw():
     y = data['coord']['y']
     timestamp = int(time())
     color = data['color']
+
+
+    if not isinstance(x,int) or not isinstance(y, int):
+        return jsonify(msg='wrong coordinate format, should be integers'), 400
+
+    if not x < XSIZE or not x >= 0:
+        return jsonify(msg=f'x coordinate out of range, should be between 0 and {XSIZE - 1}'), 400
+
+    if not y < YSIZE or not y >= 0:
+        return jsonify(msg=f'x coordinate out of range, should be between 0 and {YSIZE - 1}'), 400
+
+    if not isinstance(color,int):
+        return jsonify(msg='wrong color format, should be integer'), 400
+
+    if not color < 256 and color >= 0:
+        return jsonify(msg='color exceeded allowed value, should be between 0 and 255'), 400
 
     pixel = {
         'id': pid,
@@ -95,7 +114,7 @@ def draw():
     # pixel indeces
     store.zadd(f"pixel:timestamp:{x}:{y}", {pid:timestamp})
 
-    return jsonify(pixel), 200
+    return jsonify(pixel=pixel), 200
 
 
 @bp.route('/pixel')
@@ -124,11 +143,11 @@ def query():
         'y' : y,
     }
 
-    return jsonify(pixel), 200
+    return jsonify(pixel=pixel), 200
 
 
 @bp.route('/board')
 def get_board():
     data = store.get('board') or b''
     data = data.ljust(XSIZE * YSIZE, b'\xff')
-    return Response(b64encode(data), 200, mimetype='application/x-rgb8')
+    return jsonify(board=b64encode(data).decode('utf-8')), 200

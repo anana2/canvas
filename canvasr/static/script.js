@@ -294,32 +294,24 @@ var palette = {
 //initialize board colors and stuff
 $(function() {
 	$.ajax('/board', {
-		accepts: {
-			xrgb8: 'application/x-rgb8'
-		},
-		converters: {
-			'text xrgb8': function(data) {
-				data = atob(data);
-				l = data.length;
-				var buf = new ArrayBuffer(l*4);
-				var view = new Uint8ClampedArray(buf);
-				var j = 0;
-				for (var i = 0; i < l; i++) {
-					d = data.charCodeAt(i);
-					view[j++] = palette.red[(d & 0b11100000) >> 5];
-					view[j++] = palette.green[(d & 0b00011100) >> 2];
-					view[j++] = palette.blue[(d & 0b00000011)];
-					view[j++] = 255;
-				}
-				return buf
-			}
-		},
 		type: 'GET',
-		dataType: 'xrgb8',
+		dataType: 'json',
 		success: function(data, status, xhr){
+			data = atob(data['board']);
+			l = data.length;
+			var buf = new ArrayBuffer(l*4);
+			var view = new Uint8ClampedArray(buf);
+			var j = 0;
+			for (var i = 0; i < l; i++) {
+				d = data.charCodeAt(i);
+				view[j++] = palette.red[(d & 0b11100000) >> 5];
+				view[j++] = palette.green[(d & 0b00011100) >> 2];
+				view[j++] = palette.blue[(d & 0b00000011)];
+				view[j++] = 255;
+			}
 			const ctx = $('#canvas')[0].getContext('2d');
 			const image = ctx.createImageData(ctx.canvas.width,ctx.canvas.height);
-			image.data.set(new Uint8ClampedArray(data));
+			image.data.set(view);
 			ctx.putImageData(image,0,0);
 		}
 	});
@@ -391,33 +383,171 @@ $(function() {
 */
 var size = {x: 100, y: 100}
 
-var mousePos
+var mousePos = {
+	x: 0,
+	y: 0
+}
+
+var zoom = 1;
 
 var displacement = {
 	x: 0,
-	y: 0
+	y: 0,
+	z: 1
 };
+
+var transform = {
+	x: 0,
+	y: 0,
+	z: 1,
+	updating: false
+}
 
 var mc = new Hammer.Manager($('#canvas')[0]);
 
+mc.add(new Hammer.Pinch());
 mc.add(new Hammer.Pan());
-mc.add(new Hammer.Tap());
+mc.add(new Hammer.Tap({taps: 2, event: 'doubletap'}));
+mc.add(new Hammer.Tap({event: 'singletap'})).requireFailure('doubletap');
+mc.get('doubletap').recognizeWith('singletap');
 
-mc.on('panend', function(ev) {
-	displacement = {x: ev.deltaX + displacement.x, y: ev.deltaY + displacement.y};
+var reqAnimationFrame = (function () {
+	return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function (callback) {
+		window.setTimeout(callback, 1000/144);
+	};
+})();
+
+var updateTransform = function(el) {
+	if (!transform.updating) {
+		transform.updating = true;
+		reqAnimationFrame(function() {
+			el.style.transform =
+				"translate(" + transform.x + "px," + transform.y + "px)" +
+				" " +
+				"scale(" + transform.z + "," + transform.z + ")";
+			transform.updating = false;
+		});
+	}
+}
+
+mc.on('panstart', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+	displacement.z = transform.z;
 });
 
 mc.on('panmove', function(ev) {
-	x = ev.deltaX + displacement.x;
-	y = ev.deltaY + displacement.y;
-	ev.target.style.transform = "translate(" + x + "px," + y + "px)";
-})
+	transform.x = ev.deltaX + displacement.x;
+	transform.y = ev.deltaY + displacement.y;
+	updateTransform(ev.target);
+});
 
-mc.on('tap', function(ev) {
+mc.on('panend', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+	displacement.z = transform.z;
+});
+
+mc.on('singletap', function(ev) {
 	canvas = ev.target;
 	var mousePos = offsetPos(ev.center);
 	postPixel(_color_selected, mousePos);
 });
+
+mc.on('doubletap', function(ev) {
+	transform = {
+		x:0,y:0,z:1
+	}
+	updateTransform(ev.target);
+})
+
+mc.on('pinchstart', function(ev) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+	displacement.z = transform.z;
+})
+mc.on('pinchmove', function(ev) {
+	$canvas = $('#canvas');
+	w = $canvas.width();
+	h = $canvas.height();
+
+	transform.z = displacement.z * ev.scale;
+	if(transform.z < 1){
+		transform.z = 1;
+	}
+	else if(transform.z > 4){
+		transform.z = 4;
+	}
+	else {
+		var offset = {
+			x: (canvas.offsetLeft + displacement.x - ev.center.x),
+			y: (canvas.offsetTop + displacement.y - ev.center.y)
+		}
+		transform.x = ev.deltaX + displacement.x + offset.x * ev.scale - offset.x
+		transform.y = ev.deltaY + displacement.y + offset.y * ev.scale - offset.y
+		updateTransform(ev.target);
+	}
+});
+
+mc.on('pinchend', function(ev) {
+	displacement.z = displacement.z * ev.scale;
+	if(displacement.z < 1){
+		displacement.z = 1;
+	}
+	if(displacement.z > 4){
+		displacement.z = 4;
+	}
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+})
+
+
+$('#canvas').on("DOMMouseScroll mousewheel",function(ev) {
+	console.log(ev.originalEvent.wheelDelta)
+	if (ev.originalEvent.wheelDelta > 0) {
+		displacement.z *= 1.1;
+		if(displacement.z < 1){
+			displacement.z = 1;
+		}
+		else if(displacement.z > 4){
+			displacement.z = 4;
+		}
+		else {
+			var offset = {
+				x: -(canvas.offsetLeft + displacement.x - ev.clientX),
+				y: -(canvas.offsetTop + displacement.y - ev.clientY)
+			}
+			displacement.x = displacement.x - (offset.x * 1.1) + offset.x;
+			displacement.y = displacement.y - (offset.y * 1.1) + offset.y;
+			transform.x = displacement.x
+			transform.y = displacement.y
+			transform.z = displacement.z
+			updateTransform(event.target);
+		}
+	}
+	else {
+		displacement.z /= 1.1
+		if(displacement.z < 1){
+			displacement.z = 1;
+		}
+		else if(displacement.z > 4){
+			displacement.z = 4;
+		}
+		else {
+			var offset = {
+				x: -(canvas.offsetLeft + displacement.x - ev.clientX),
+				y: -(canvas.offsetTop + displacement.y - ev.clientY)
+			}
+			displacement.x = displacement.x - (offset.x / 1.1) + offset.x;
+			displacement.y = displacement.y - (offset.y / 1.1) + offset.y;
+			transform.x = displacement.x
+			transform.y = displacement.y
+			transform.z = displacement.z
+			updateTransform(event.target);
+		}
+	}
+});
+
 
 /*
 
@@ -448,16 +578,19 @@ $('#canvas').mousedown(event => {
 
 
 function offsetPos(pos) {
+	displacement.x = transform.x;
+	displacement.y = transform.y;
+	displacement.z = transform.z;
 	var canvas = $('#canvas')[0];
-	var offset = {
-		x: canvas.offsetLeft + displacement.x,
-		y: canvas.offsetTop + displacement.y
-	}
 	var width = $('#canvas').width();
 	var height = $('#canvas').height();
+	var offset = {
+		x: (canvas.offsetLeft + displacement.x),
+		y: (canvas.offsetTop + displacement.y)
+	}
 	return {
-		y: Math.floor((pos.y - offset.y)*size.y/height),
-		x: Math.floor((pos.x - offset.x)*size.x/width)
+		y: Math.floor((pos.y - offset.y) * size.y / height/displacement.z),
+		x: Math.floor((pos.x - offset.x) * size.x / width/displacement.z)
 	}
 }
 
