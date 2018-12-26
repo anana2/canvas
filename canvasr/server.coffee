@@ -1,5 +1,5 @@
-koa = require('koa')
-app = new koa()
+import koa from 'koa'
+app = new koa
 
 
 ###
