@@ -1,43 +1,11 @@
 {
   "name": "canvas",
-  "version": "0.0.0",
-  "description": "[![Build Status](https://travis-ci.com/Muttsu/canvas.svg?token=bSsqeeizRAWGzy6Uyas7&branch=master)](https://travis-ci.com/Muttsu/canvas)",
-  "main": "server.js",
-  "private": true,
-  "directories": {
-    "test": "tests"
-  },
-  "dependencies": {
-    "@babel/core": "^7.2.2",
-    "babel-cli": "^6.26.0",
-    "babel-loader": "^8.0.4",
-    "koa": "^2.6.2",
-    "koa-webpack-dev-middleware": "^2.0.2",
-    "webpack": "^4.28.2",
-    "webpack-hot-middleware": "^2.24.3",
-    "webpack-merge": "^4.1.5"
-  },
-  "devDependencies": {
-    "coffee-loader": "^0.9.0",
-    "coffeescript": "^2.3.2",
-    "koa-webpack": "^5.1.1",
-    "koa-webpack-hmr-middleware": "^1.0.4",
-    "nodemon-webpack-plugin": "^4.0.7",
-    "pug": "^2.0.3",
-    "pug-plain-loader": "^1.0.0",
-    "start-server-webpack-plugin": "^3.0.0-rc3",
-    "vue": "^2.5.21",
-    "vue-loader": "^15.4.2",
-    "vue-template-compiler": "^2.5.21",
-    "webpack-cleanup-plugin": "^0.5.1",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-middleware": "^3.4.0",
-    "webpack-node-externals": "^1.7.2"
-  },
+  "version": "0.0.1",
+  "description": "canvas app",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config client/webpack/config.dev.js",
-    "start": "webpack --env.NODE_ENV=development --config canvasr/webpack/config.dev.js"
+    "start": "cd ./canvasr && npm run start:dev"
   },
   "repository": {
     "type": "git",

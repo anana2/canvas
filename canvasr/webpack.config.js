@@ -1,10 +1,12 @@
 const webpack = require('webpack');
 const path = require('path');
 const webpack_cleanup_plugin = require('webpack-cleanup-plugin');
+const webpack_server_start_plugin = require('start-server-webpack-plugin');
 module.exports = {
-    entry: [
-        './server.coffee'
-    ],
+    entry: {
+        server: './src/server.coffee'
+    },
+    mode: 'production',
     module: {
         rules: [
             {
@@ -17,13 +19,12 @@ module.exports = {
             }
         ]
     },
-    context: path.resolve(__dirname, '..'),
     plugins: [
         new webpack.NamedModulesPlugin(),
         new webpack_cleanup_plugin()
     ],
     output: {
-        path: path.resolve(__dirname, './dist'),
-        filename: 'server.js'
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js'
     },
 };

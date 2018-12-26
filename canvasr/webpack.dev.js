@@ -1,10 +1,8 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
-const path = require('path');
-const common = require('./config.common.js');
-const NodemonPlugin = require( 'nodemon-webpack-plugin' )
+const NodemonPlugin = require('nodemon-webpack-plugin');
 
-module.exports = merge(common, {
+module.exports = merge(require('./webpack.config.js'), {
     watch: true,
     target: 'async-node',
     externals: [
@@ -18,6 +16,9 @@ module.exports = merge(common, {
         new webpack.NoEmitOnErrorsPlugin(),
         new NodemonPlugin({
             verbose: true
+        }),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('development')
         })
     ]
 });
