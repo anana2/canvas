@@ -3,7 +3,7 @@ const path = require('path');
 const webpack_cleanup_plugin = require('webpack-cleanup-plugin');
 module.exports = {
     entry: [
-        './canvasr/server.coffee'
+        './server.coffee'
     ],
     module: {
         rules: [
