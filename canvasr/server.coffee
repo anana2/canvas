@@ -1,9 +1,9 @@
-const koa = require('koa');
-const app = new koa();
+koa = require('koa')
+app = new koa()
 
 
-if (process.env.NODE_ENV !== 'production') {
-    /*
+###
+if process.env.NODE_ENV isnt 'production'
     const config = require('../webpack/server.config.dev.js');
     const compiler = require('webpack')(config);
 
@@ -18,14 +18,12 @@ if (process.env.NODE_ENV !== 'production') {
         log: console.log,
         path: '/__webpack_hmr', heartbeat: 10 * 1000
     }));
-    */
-}
+###
 
 
-app.use(async ctx => {
-    ctx.body = 'Hello World!';
-});
+app.use (ctx) ->
+    ctx.body = 'Hello World!'
 
-app.listen(5000)
+app.listen 5000
 
-console.log(`listening on port ${5000}`);
+console.log "listening on port #{5000}"

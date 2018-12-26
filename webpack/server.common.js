@@ -3,13 +3,19 @@ const path = require('path');
 const webpack_cleanup_plugin = require('webpack-cleanup-plugin');
 module.exports = {
     entry: [
-        './canvasr/server'
+        './canvasr/server.coffee'
     ],
     module: {
-        rules: [{
-            test: /\.js?$/,
-            use: 'babel-loader'
-        }]
+        rules: [
+            {
+                test: /\.js?$/,
+                use: 'babel-loader'
+            },
+            {
+                test: /\.coffee?$/,
+                use: 'coffee-loader'
+            }
+        ]
     },
     context: path.resolve(__dirname, '..'),
     plugins: [
