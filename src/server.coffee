@@ -1,5 +1,5 @@
-import koa from 'koa'
-app = new koa
+import http from 'http'
+import app from './api/app'
 
 
 ###
@@ -20,8 +20,20 @@ if process.env.NODE_ENV isnt 'production'
     }));
 ###
 
+current_app = app.callback()
+server = http.createServer(current_app)
 
-app.use (ctx) ->
-    ctx.body = 'Hello World!'
+port = process.env.PORT || 5000
 
-app.listen 5000
+server.listen port, (e) ->
+    console.log("\nlistening on #{port}")
+
+if module.hot
+    console.log('\nhot reloading enabled')
+    module.hot.accept './api/app.coffee', ->
+        server.removeListener('request', current_app)
+        current_app = app.callback()
+        server.on 'request', current_app
+
+
+
