@@ -19,7 +19,7 @@ hiredis = "*"
 flask-socketio = "*"
 redis = "*"
 eventlet = "*"
-gunicorn = "==18"
+gunicorn = "==19.5.0"
 flask-cors = "*"
 
 [requires]
